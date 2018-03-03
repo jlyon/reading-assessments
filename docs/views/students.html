@@ -16,10 +16,9 @@
     <th><a ng-click="setSort('LastName', $event)" href="#">Name</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('ReadingTeacher', $event)" href="#">Teacher</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('Crew', $event)" href="#">Crew</a></th>
-    <th><a ng-click="setSort('LastLettersAssessment', $event)" href="#">Letters</a></th>
-    <th><a ng-click="setSort('LastWordsAssessment', $event)" href="#">Words</a></th>
-    <th class="hidden-xs-down"><a ng-click="setSort('TotalLetters', $event)" href="#">Total Letters</a></th>
-    <th class="hidden-xs-down"><a ng-click="setSort('TotalWords', $event)" href="#">Total Words</a></th>
+    <th><a ng-click="setSort('LastAssessment', $event)" href="#">Last Assessment</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('Mastery', $event)" href="#">Mastery</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('Closeness', $event)" href="#">Closeness</a></th>
   </tr>
   </thead>
   <tbody>
@@ -29,19 +28,13 @@
     <td class="hidden-xs-down">{{student.ReadingTeacher}}</td>
     <td class="hidden-xs-down">{{student.Crew}}</td>
     <td>
-      <a ui-sref="editAssessment({type: 'letters', student: student.id})">
+      <a ui-sref="editAssessment({student: student.id})">
         <span ng-if="student['LastLettersAssessment']"><span class="hidden-xs-down">Last:</span> {{student['LastLettersAssessment'] | date:'M/d/yyyy'}}</span>
         <span ng-if="!student['LastLettersAssessment']">+ Create</span>
       </a>
     </td>
-    <td>
-      <a ui-sref="editAssessment({type: 'words', student: student.id})">
-        <span ng-if="student['LastWordsAssessment']"><span class="hidden-xs-down">Last:</span> {{student['LastWordsAssessment'] | date:'M/d/yyyy'}}</span>
-        <span ng-if="!student['LastWordsAssessment']">+ Create</span>
-      </a>
-    </td>
-    <td class="hidden-xs-down">{{student['TotalLetters']}}</td>
-    <td class="hidden-xs-down">{{student['TotalWords']}}</td>
+    <td class="hidden-xs-down">{{student['Mastery']}}</td>
+    <td class="hidden-xs-down"><strong ng-class="student.Closeness >= 0 ? 'text-success' : 'text-danger'">{{student.Closeness | number:2}}</strong></td>
   </tr>
   </tbody>
 </table>

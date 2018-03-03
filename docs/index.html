@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" ng-attr-content="{{metaDescription()}}"/>
     <meta name="keywords" ng-attr-content="{{metaKeywords()}}"/>
-    <title>Lodestar Progress Tracker</title>
+    <title>Lodestar Reading Assessments</title>
     <link rel="stylesheet" href="css/libraries.min.css">
 
     <link rel="stylesheet" href="css/app.min.css">
@@ -46,10 +46,11 @@
         <span class="icon-bar"></span>
       </button>
       -->
-      <span class="navbar-brand">Lodestar Progress Tracker</span>
+      <span class="navbar-brand">Lodestar Reading Assessments</span>
     </div>
     <ul class="nav navbar-nav" ng-if="showAdmin" ng-class="showAdmin ? '' : 'hidden'">
-      <li><a ui-sref="students">Students</a></li>
+      <li><a ui-sref="students">Student List</a></li>
+      <li><a ui-sref="students">Progress Chart</a></li>
     </ul>
     <!--
     <div id="navbar" class="navbar-collapse collapse">
