@@ -1,0 +1,84 @@
+// Bourbon
+// ---------------------------------
+@import url('https://fonts.googleapis.com/css?family=Didact+Gothic');
+
+body {
+  padding-top: 70px;
+}
+
+h1 {
+  margin-bottom: .5em;
+}
+img {
+  max-width: 100%;
+}
+
+input,
+select {
+  max-width: 200px;
+}
+
+
+.assessment {
+  .form-control {
+  }
+}
+
+
+.assessments {
+
+}
+
+
+
+.hide-no-print {
+  display: none;
+}
+
+@page {
+  size: letter;
+}
+
+@media print {
+  
+  .hide-no-print {
+    display: block;
+  }
+  
+  body {
+    -webkit-print-color-adjust: exact;
+    padding-top: 0;
+    
+    .container {
+      max-width: 800px;
+    }
+  }
+  
+  .no-print {
+    display: none;
+  }
+  
+  .list-group {
+    page-break-inside: avoid;
+  }
+  
+  .assessment {
+    page-break-after: always;
+    
+    //a.btn {
+    //  font-size: 24px;
+    //  padding: 6px 12px;
+    //}
+  }
+  
+  .list-group-item {
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hidden-xs-down {
+    display: none;
+  }
+}
+

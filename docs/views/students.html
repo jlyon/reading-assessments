@@ -1,0 +1,47 @@
+<form class="form-inline">
+  <div class="form-group no-print">
+    <button class="btn btn-primary" ng-click="print()"><i class="fa fa-fw fa-print"></i>Print Selected</button>
+  </div>
+  <div class="form-group">
+    <input class="form-control" ng-model="query" placeholder="Student Name or Crew" />
+  </div>
+</form>
+
+<hr class=" no-print"/>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th><input type="checkbox" ng-model="checkall" ng-click="checkallClick()"></th>
+    <th><a ng-click="setSort('LastName', $event)" href="#">Name</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('ReadingTeacher', $event)" href="#">Teacher</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('Crew', $event)" href="#">Crew</a></th>
+    <th><a ng-click="setSort('LastLettersAssessment', $event)" href="#">Letters</a></th>
+    <th><a ng-click="setSort('LastWordsAssessment', $event)" href="#">Words</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('TotalLetters', $event)" href="#">Total Letters</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('TotalWords', $event)" href="#">Total Words</a></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="student in students | filter: query | orderBy: order">
+    <td><input type="checkbox" ng-model="student.selected"></td>
+    <td>{{student['LastName']}}, {{student['FirstName']}}</td>
+    <td class="hidden-xs-down">{{student.ReadingTeacher}}</td>
+    <td class="hidden-xs-down">{{student.Crew}}</td>
+    <td>
+      <a ui-sref="editAssessment({type: 'letters', student: student.id})">
+        <span ng-if="student['LastLettersAssessment']"><span class="hidden-xs-down">Last:</span> {{student['LastLettersAssessment'] | date:'M/d/yyyy'}}</span>
+        <span ng-if="!student['LastLettersAssessment']">+ Create</span>
+      </a>
+    </td>
+    <td>
+      <a ui-sref="editAssessment({type: 'words', student: student.id})">
+        <span ng-if="student['LastWordsAssessment']"><span class="hidden-xs-down">Last:</span> {{student['LastWordsAssessment'] | date:'M/d/yyyy'}}</span>
+        <span ng-if="!student['LastWordsAssessment']">+ Create</span>
+      </a>
+    </td>
+    <td class="hidden-xs-down">{{student['TotalLetters']}}</td>
+    <td class="hidden-xs-down">{{student['TotalWords']}}</td>
+  </tr>
+  </tbody>
+</table>

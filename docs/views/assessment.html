@@ -1,0 +1,160 @@
+<!--<div ng-if="colors && items && assessments">-->
+<div>
+<div ng-class="show && student['FirstName'] ? '' : 'force-no-print'" ng-if="!showFlashcards">
+<h2 ng-if="student.FirstName">{{student['FirstName']}} {{student['LastName']}}'s {{type}} Progress <small>{{student.Crew}}</small></h2>
+
+
+<div class="form-group row no-print" ng-if="edit">
+  <div class="col-sm-12">
+    <div class="input-group" style="max-width: 500px;">
+      <span class="input-group-addon" id="basic-addon1"><i class="fa fa-fw fa-link"></i></span>
+      <input type="text" class="form-control" aria-describedby="basic-addon1" ng-model="link" ng-click="linkClick($event)" />
+    </div>
+  </div>
+</div>
+
+
+<span ng-repeat="color in colors">
+  <style>
+    .color-{{color.id}} {
+      background-color: #{{color.Code}} !important;
+    }
+  </style>
+</span>
+
+<div class="row assessments">
+  <div class="col-xs-12 col-sm-7 col-lg-4">
+
+    <!--<table ng-if="assessments.length" class="table table-striped">
+      <thead>
+      <tr>
+        <th class="color-swatch"><span></span></th>
+        <th class="date">Date</th>
+        <th>Total</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="item in assessments">
+        <td class="color-swatch"><span class="color-{{item.Color[0]}}">&nbsp;</span></td>
+        <td class="date">{{item.Date | date:'MMMM d yyyy'}}</td>
+        <td>{{item.sum || 0}}</td>
+      </tr>
+      </tbody>
+    </table>-->
+
+    <div class="list-group" ng-if="assessments">
+      <a ng-repeat="item in assessments"
+         title="Edit this assessment"
+         ng-click="clickAssessment(item)"
+         ng-class="assessment && assessment.id == item.id ? 'active' : ''"
+         class="list-group-item list-group-item list-group-item-action">
+        <span class="color-swatch color-{{item.Color[0]}}" class="btn"></span>
+        {{item.Date | date:'MMMM d yyyy'}}
+        <span class="badge label label-success pull-right">{{item.sum || 0}}</span>
+      </a>
+    </div>
+  </div>
+  <div class="col-xs-6 no-print" ng-if="!assessment && edit">
+
+  </div>
+</div>
+
+<p class="no-print" ng-if="!assessment && edit">
+  <button class="btn btn-primary" ng-click="newAssessment()"><i class="fa fa-fw fa-plus-circle"></i>Create New Assessment</button>
+  <button class="btn btn-default" ng-click="toggleShowFlashcards()"><i class="fa fa-fw fa-th"></i>Create Flashcards</button>
+</p>
+
+<form class="assessment" ng-class="!assessment ? 'form-disabled' : ''">
+
+  <div ng-if="assessment" class="no-print">
+
+    <h2 ng-if="assessment.id">Edit Assessment from {{assessment.Date | date:'MMMM d yyyy'}}</h2>
+    <h2 ng-if="!assessment.id">Create new Assessment</h2>
+
+    <div class="form-group row">
+      <div class="col-sm-12">
+        <button class="btn btn-primary" ng-click="saveAssessment(assessment)"><i class="fa fa-fw fa-floppy-o"></i>Save</button>
+        <button class="btn" ng-click="cancelAssessment()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-sm-12 col-form-label">Date</label>
+      <div class="col-sm-4">
+        <input type="date" class="form-control" ng-model="assessment.Date">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-sm-12 col-form-label">Color</label>
+      <div class="col-sm-10 list-colors">
+        <a class="btn btn-default"
+           ng-repeat="color in colors"
+           title="{{color.Label}}"
+           ng-click="setColor(color)"
+           ng-class="assessment.Color[0] == color.id ? 'active' : ''"
+           ng-style="{backgroundColor: '#' + color.Code}">
+          &nbsp;
+        </a>
+      </div>
+    </div>
+    <style>
+      .list-items .active{
+        background-color: #{{activeColor.Code}} !important;
+      }
+    </style>
+  </div>
+
+  <div class="list-group list-items" ng-repeat="group in groups" ng-if="assessment || assessments.length">
+    <h4>{{group.Label}}</h4>
+    <a ng-repeat="item in items"
+       ng-if="item.Group[0] == group.id"
+       class="btn btn-default"
+       ng-click="toggleWord(item.id)"
+       ng-class="assessment && assessment.Items.indexOf(item.id) != -1 ? 'active' : (disabledItems[item.id] ? 'disabled color-' + disabledItems[item.id] : '' )">
+      {{item.Item}}
+    </a>
+  </div>
+
+  <div ng-if="assessment" class="no-print form-group row">
+    <div class="col-sm-12">
+      <button class="btn btn-primary" ng-click="saveAssessment(assessment)"><i class="fa fa-fw fa-floppy-o"></i>Save</button>
+      <button class="btn" ng-click="cancelAssessment()">Cancel</button>
+    </div>
+  </div>
+
+</form>
+</div>
+
+
+<div class="list-group list-items" ng-if="showFlashcards">
+  <div class="no-print">
+    <h2>Print {{type}} Flashcards for {{student['FirstName']}} {{student['LastName']}}</h2>
+    <p>
+      <button class="btn btn-primary" ng-click="toggleShowFlashcards()"><i class="fa fa-fw fa-chevron-left"></i>Back to Assessments</button>
+    </p>
+
+    <hr/>
+    <form class="form-inline">
+      <div class="form-group">
+        <label>Number of pages</label>
+        <input type="text" class="form-control" ng-model="flashcardPages">
+      </div>
+      <button class="btn btn-default" ng-click="updateFlashcards(flashcardPages)">Update</button>
+    </form>
+    <hr/>
+    <p>Showing {{flashcards.length}} flashcards</p>
+  </div>
+
+  <div class="flashcards">
+    <div ng-repeat="item in flashcards"
+         class="flashcard"
+         ng-click="toggleWord(item.id)">
+      <span class="color-swatch color-{{item.Color[0]}}" class="btn"></span>
+      <div class="student-name">{{student['FirstName']}} {{student['LastName']}}</div>
+      <div class="content">{{item.Item}}</div>
+    </div>
+  </div>
+</div>
+
+</div>
