@@ -22,6 +22,7 @@
     <th>Expected</th>
     <th>Mastery</th>
     <th>Grade Band</th>
+    <th>Growth</th>
   </tr>
   </thead>
   <tbody>
@@ -31,6 +32,7 @@
     <td>{{item.assessment.ExpectedTextLevel}}</td>
     <td>{{item.assessment.Mastery}}</td>
     <td>{{item.assessment.GradeLevel === 0 ? 'K' : item.assessment.GradeLevel}}</td>
+    <td><span ng-if="item.assessment.GrowthLevel">{{item.assessment.GrowthLevel - assessments[0].GrowthLevel | number:2}}</span></td>
   </tr>
   </tbody>
 </table>
@@ -52,6 +54,7 @@
       <th ng-if="edit" class="no-print">Fluency</th>
       <th>Mastery</th>
       <th>Grade-level Closeness</th>
+      <th>Growth</th>
       <th class="hidden-xs-down no-print">Notes</th>
     </tr>
     </thead>
@@ -66,6 +69,7 @@
       <td ng-if="edit" class="no-print">{{item.Fluency}}</td>
       <td>{{item.Mastery}}</td>
       <td><strong ng-class="item.Closeness >= 0 ? 'text-success' : 'text-danger'">{{item.Closeness | number:2}}</strong></td>
+      <td class="hidden-xs-down">{{item.GrowthLevel - assessments[0].GrowthLevel | number:2}}</td>
       <td class="hidden-xs-down no-print">{{item.Notes}}</td>
     </tr>
     </tbody>
@@ -103,9 +107,9 @@
     </div>
     <hr/>
     <div class="form-group row">
-      <label for="type" class="col-sm-2 col-form-label">Book Type</label>
+      <label for="type" class="col-sm-2 col-form-label">Genre</label>
       <div class="col-sm-10">
-        <select class="form-control" ng-model="assessment.Type" id="type" required="required">
+        <select class="form-control" ng-model="assessment.Genre" id="type" required="required">
           <option>Fiction</option>
           <option>Non-fiction</option>
         </select>
