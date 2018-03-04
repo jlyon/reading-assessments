@@ -44,28 +44,6 @@ angular.module('app')
           $scope.growth = $rootScope.cache.GrowthCalculator;
         }
 
-        // if ($rootScope.cache[$scope.type + ' Groups'] == undefined) {
-        //   var groups = [];
-        //   $rootScope.Airtable($scope.type + ' Groups').select({
-        //     sort: [
-        //       {field: 'Order', direction: 'asc'}
-        //     ]
-        //   }).eachPage(function page(records, fetchNextPage) {
-        //     records.forEach(function (record) {
-        //       record.fields.id = record.id;
-        //       groups.push(record.fields);
-        //     });
-        //     fetchNextPage();
-        //   }, function done(error) {
-        //     $rootScope.cache[$scope.type + ' Groups'] = groups;
-        //     $scope.groups = groups;
-        //     $scope.$apply();
-        //   });
-        // }
-        // else {
-        //   $scope.groups = $rootScope.cache[$scope.type + ' Groups'];
-        // }
-
         var calculateQuarters = function(assessment, assessments) {
           var quarters = $scope.quarters;
           var last = 0;
@@ -108,6 +86,10 @@ angular.module('app')
               $scope.show = assessments.length ? true : false;
               $scope.assessments = assessments;
 
+              if (!assessments.length) {
+                $scope.newAssessment();
+              }
+
               // Get the Quarters
               if ($rootScope.cache.Quarters == undefined) {
                 var items0 = [];
@@ -148,35 +130,12 @@ angular.module('app')
           $scope.showAllAssessments = !$scope.showAllAssessments;
         }
 
-
-
-
-        // $scope.linkClick = function ($event) {
-        //   $event.target.select();
-        // };
-        //
-        // $scope.toggleWord = function(word) {
-        //   var index = $scope.assessment.Items.indexOf(word);
-        //   if (index != -1) {
-        //     $scope.assessment.Items.splice(index, 1);
-        //   }
-        //   else {
-        //     $scope.assessment.Items.push(word);
-        //   }
-        //   //$scope.$apply();
-        // }
-        //
-        // $scope.setColor = function(color) {
-        //   $scope.assessment.Color[0] = color.id;
-        //   $scope.activeColor = color;
-        // }
-
         $scope.newAssessment = function() {
           $scope.assessment = {
             Student: [$scope.student],
             Grade: $scope.student.Grade,
             Date: new Date(),
-            Type: 'Fiction',
+            Genre: 'Fiction',
             TextLevel: '',
             ExpectedTextLevel: '',
             Accuracy: '',
@@ -244,40 +203,23 @@ angular.module('app')
             if (i < gradeKey + key) {
               console.log(i, item.Growth);
               expected += parseFloat(item.Growth);
-              $scope.assessment.ExpectedTextLevel = item.TextLevel;
+              expectedTextLevel = item.TextLevel;
             }
             if (!foundTextLevel) {
               current += parseFloat(item.Growth);
             }
             if (item.TextLevel == $scope.assessment.TextLevel) {
-              foundTextLevel = true;
+              foundTextLevel = item;
             }
           }
 
+          $scope.assessment.GrowthLevel = current;
           $scope.assessment.Closeness = current - expected;
-          $scope.assessment.GradeLevel = Math.floor(current);
+          $scope.assessment.GradeLevel = parseInt(foundTextLevel.GradeLevel);
+          $scope.assessment.ExpectedTextLevel = expectedTextLevel;
 
           console.log('expected', expected, current);
-
           console.log(gradeLevels);
-          //
-          // var gradeLevels = [];
-          // var expected = 0;
-          // var current = 0;
-          // while (var i < $scope.growth.length && var grade <= $scope.student.Grade) {
-          //   var item = $scope.growth[i];
-          //   if (item.GradeLevel === $scope.student.Grade) {
-          //     gradeLevels.push($scope.growth[i])
-          //   }
-          // }
-
-          //for (var i=0; i<)
-
-          console.log(start, end);
-          console.log();
-
-
-          console.log();
         }
 
         $scope.cancelAssessment = function() {
@@ -285,10 +227,6 @@ angular.module('app')
         }
 
         $scope.saveAssessment = function(assessment) {
-          // if (!assessment.Color || !assessment.Color[0]) {
-          //   alert('You must select a color');
-          //   return false;
-          // }
           if (assessment.id) {
             var id = assessment.id;
             delete assessment.id;
@@ -319,9 +257,17 @@ angular.module('app')
         }
 
         var saveAssessmentCallback = function (assessment, assessments) {
+          getStudents(saveAssessmentLoadedCallback);
+        }
+
+        var saveAssessmentLoadedCallback = function(assessment, assessments) {
+          calculateQuarters(assessment, assessments);
+
+          // Get the last assessment
+          assessment = assessments[assessments.length - 1];
+
           var studentEdit = {};
           studentEdit['LastAssessment'] = assessment.Date;
-          var last = assessments.pop();
           studentEdit['LastAssessment'] = assessment.Date;
           studentEdit['Closeness'] = assessment.Closeness;
           studentEdit['Accuracy'] = assessment.Accuracy;
@@ -330,12 +276,13 @@ angular.module('app')
           studentEdit['Notes'] = assessment.Notes;
           studentEdit['Mastery'] = assessment.Mastery;
           studentEdit['TextLevel'] = assessment.TextLevel;
-          studentEdit['Type'] = assessment.Type;
+          studentEdit['Genre'] = assessment.Genre;
+          studentEdit['AnnualGrowth'] = assessment.GrowthLevel - assessments[0].GrowthLevel;
           $rootScope.Airtable('Students').update($scope.student.id, studentEdit, function(err, record) {
             if (err) { console.log(err); return; }
             $scope.assessment = null;
-            getStudents(calculateQuarters);
           });
+
         }
 
 
