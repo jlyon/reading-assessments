@@ -7,12 +7,16 @@ h1 {
 
 img.grade-level-chart {
   max-width: 100%;
+  width: 900px;
   margin-bottom: 1em; }
 
 .assessment-form input,
 .assessment-form select,
 .assessment-form .input-group {
   max-width: 200px; }
+
+.assessment-wrapper {
+  margin-bottom: 200px; }
 
 .hide-no-print {
   display: none; }

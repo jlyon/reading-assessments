@@ -55,7 +55,7 @@ angular.module('app', [
         //////////////////////////
         $stateProvider
           .state("students", {
-            url: '/admin/students',
+            url: '/admin/students/:query',
             templateUrl: 'views/students.html',
             // auth: true,
             /*resolve: {
@@ -83,10 +83,10 @@ angular.module('app', [
                 $scope.$apply();
               });
 
-              $scope.query = '';
+              $rootScope.query = $state.params.query;
               $scope.setSort = function(key, e) {
                 if (!key) {
-                  $scope.order = ['LastAssessment', 'Closeness'];
+                  $scope.order = ['Closeness', 'LastAssessment'];
                   return;
                 }
                 e.preventDefault();
@@ -127,7 +127,7 @@ angular.module('app', [
 
         $stateProvider
           .state("studentsChart", {
-            url: '/admin/students/chart',
+            url: '/admin/chart/:query',
             templateUrl: 'views/students-chart.html',
             // auth: true,
             /*resolve: {
@@ -137,7 +137,7 @@ angular.module('app', [
             },*/
             controller: function ($scope, $rootScope, $state, $filter, $http) {
               $rootScope.showAdmin = true;
-              $scope.query = null;
+              $rootScope.query = $state.params.query;
 
               var calculate = function(students) {
                 if ($scope.query && $scope.query.length) {
@@ -181,11 +181,6 @@ angular.module('app', [
               $scope.updateQuery = function() {
                 calculate($scope.students, $scope.query);
               }
-
-
-
-
-
             }
           })
 

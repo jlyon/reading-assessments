@@ -16,6 +16,7 @@ angular.module('app')
       link: function($scope, $element, $attrs, $window) {
 
         $scope.show = false;
+        $scope.showAllAssessments = $scope.edit;
 
         $timeout(function(){
           $scope.link = window.location.href.replace('/admin', '');
@@ -92,7 +93,6 @@ angular.module('app')
 
             var assessments = [];
             var disabledItems = {};
-            var sum = 0;
             $rootScope.Airtable('Assessments').select({
               filterByFormula: '{Student} = "' + record.fields.ID + '"',
               sort: [
@@ -101,8 +101,6 @@ angular.module('app')
             }).eachPage(function page(records, fetchNextPage) {
               records.forEach(function (record) {
                 record.fields.id = record.id;
-                sum += record.fields.Items ? record.fields.Items.length : 0;
-                record.fields.sum = sum;
                 assessments.push(record.fields);
               });
               fetchNextPage();
@@ -146,6 +144,10 @@ angular.module('app')
         }
         getStudents(calculateQuarters);
 
+        $scope.toggleAllAssessments = function() {
+          $scope.showAllAssessments = !$scope.showAllAssessments;
+        }
+
 
 
 
@@ -187,6 +189,7 @@ angular.module('app')
         }
 
         $scope.clickAssessment = function(item, e) {
+          e.preventDefault();
           if (!$scope.edit) {
             return;
           }
@@ -198,11 +201,6 @@ angular.module('app')
               if ($scope.assessments[j].id == item.id) {
                 $scope.assessments[j].Date = new Date($scope.assessments[j].Date);
                 $scope.assessment = $scope.assessments[j];
-                for (var i=0; i<$scope.colors.length; i++) {
-                  if ($scope.colors[i].id == $scope.assessment.Color[0]) {
-                    $scope.setColor($scope.colors[i]);
-                  }
-                }
               }
             }
           }
@@ -329,7 +327,10 @@ angular.module('app')
           studentEdit['Accuracy'] = assessment.Accuracy;
           studentEdit['Comprehension'] = assessment.Comprehension;
           studentEdit['Fluency'] = assessment.Fluency;
-          studentEdit['Mastery'] = assessment.TextLevel + '/' + assessment.Mastery + '/' + assessment.Type;
+          studentEdit['Notes'] = assessment.Notes;
+          studentEdit['Mastery'] = assessment.Mastery;
+          studentEdit['TextLevel'] = assessment.TextLevel;
+          studentEdit['Type'] = assessment.Type;
           $rootScope.Airtable('Students').update($scope.student.id, studentEdit, function(err, record) {
             if (err) { console.log(err); return; }
             $scope.assessment = null;

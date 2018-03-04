@@ -1,6 +1,5 @@
 <!--<div ng-if="colors && items && assessments">-->
-<div>
-<form ng-class="show && student['FirstName'] ? '' : 'force-no-print'" ng-if="!showFlashcards">
+<div class="assessment-wrapper">
 <h2 ng-if="student.FirstName">{{student['FirstName']}} {{student['LastName']}}'s Reading Assessments <small>{{student.Crew}}</small></h2>
 
 
@@ -20,10 +19,9 @@
   <tr>
     <th>Quarter</th>
     <th>Level</th>
-    <th>Expected Level</th>
+    <th>Expected</th>
     <th>Mastery</th>
     <th>Grade Band</th>
-    <th>Grade Level Closeness</th>
   </tr>
   </thead>
   <tbody>
@@ -33,50 +31,57 @@
     <td>{{item.assessment.ExpectedTextLevel}}</td>
     <td>{{item.assessment.Mastery}}</td>
     <td>{{item.assessment.GradeLevel === 0 ? 'K' : item.assessment.GradeLevel}}</td>
-    <td><strong ng-class="item.assessment.Closeness >= 0 ? 'text-success' : 'text-danger'">{{item.assessment.Closeness | number:2}}</strong></td>
   </tr>
   </tbody>
 </table>
 
 <hr/>
-<h3>All Assessments</h3>
-<p ng-if="!assessments.length">No assessments have been created for {{student['FirstName']}} {{student['LastName']}}.</p>
-<table ng-if="assessments.length" class="table table-striped">
-  <thead>
-  <tr>
-    <th>Date</th>
-    <th>Level</th>
-    <th>Expected Level</th>
-    <th>Type</th>
-    <th ng-if="edit" class="no-print">Accuracy</th>
-    <th ng-if="edit" class="no-print">Comprehension</th>
-    <th ng-if="edit" class="no-print">Fluency</th>
-    <th>Mastery</th>
-    <th>Grade-level Closeness</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr ng-repeat="item in assessments">
-    <td>{{item.Date | date:'MMMM d yyyy'}}</td>
-    <td>{{item.TextLevel}}</td>
-    <td>{{item.ExpectedTextLevel}}</td>
-    <td>{{item.Type}}</td>
-    <td ng-if="edit" class="no-print"><span ng-if="item.Accuracy">{{item.Accuracy}}%</span></td>
-    <td ng-if="edit" class="no-print">{{item.Comprehension}}</td>
-    <td ng-if="edit" class="no-print">{{item.Fluency}}</td>
-    <td>{{item.Mastery}}</td>
-    <td><strong ng-class="item.Closeness >= 0 ? 'text-success' : 'text-danger'">{{item.Closeness | number:2}}</strong></td>
-  </tr>
-  </tbody>
-</table>
+<div ng-if="showAllAssessments">
+  <button class="btn btn-default pull-right no-print" ng-click="toggleAllAssessments()"><i class="fa fa-fw fa-times"></i>Hide</button>
+  <h3>All Assessments</h3>
+  <p ng-if="!assessments.length">No assessments have been created for {{student['FirstName']}} {{student['LastName']}}.</p>
+  <table ng-if="assessments.length" class="table table-striped">
+    <thead>
+    <tr>
+      <th>Date</th>
+      <th>Level</th>
+      <th>Expected</th>
+      <th>Type</th>
+      <th ng-if="edit" class="no-print">Accuracy</th>
+      <th ng-if="edit" class="no-print">Comp.</th>
+      <th ng-if="edit" class="no-print">Fluency</th>
+      <th>Mastery</th>
+      <th>Grade-level Closeness</th>
+      <th class="hidden-xs-down no-print">Notes</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="item in assessments">
+      <td><a href="#" ng-click="clickAssessment(item, $event)" title="Edit Assessment">{{item.Date | date:'MMMM d yyyy'}}</a></td>
+      <td>{{item.TextLevel}}</td>
+      <td>{{item.ExpectedTextLevel}}</td>
+      <td>{{item.Type}}</td>
+      <td ng-if="edit" class="no-print"><span ng-if="item.Accuracy">{{item.Accuracy}}%</span></td>
+      <td ng-if="edit" class="no-print">{{item.Comprehension}}</td>
+      <td ng-if="edit" class="no-print">{{item.Fluency}}</td>
+      <td>{{item.Mastery}}</td>
+      <td><strong ng-class="item.Closeness >= 0 ? 'text-success' : 'text-danger'">{{item.Closeness | number:2}}</strong></td>
+      <td class="hidden-xs-down no-print">{{item.Notes}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
 
-<p class="no-print" ng-if="!assessment && edit">
-  <button class="btn btn-primary" ng-click="newAssessment()"><i class="fa fa-fw fa-plus-circle"></i>Create New Assessment</button>
+<p class="no-print">
+  <button ng-if="!showAllAssessments" class="btn btn-primary" ng-click="toggleAllAssessments()"><i class="fa fa-fw fa-info-circle"></i>See All Assessments</button>
+  <button ng-if="!assessment && edit" class="btn btn-primary" ng-click="newAssessment()"><i class="fa fa-fw fa-plus-circle"></i>Create New Assessment</button>
 </p>
 
 <div ng-if="assessment.Date" class="assessment-form">
   <form class="assessment  no-print">
-    <h3>Create New Assessment</h3>
+    <hr/>
+    <h3 ng-if="!assessment.id">Create New Assessment</h3>
+    <h3 ng-if="assessment.id">Edit Assessment</h3>
     <hr/>
     <div class="form-group row">
       <label for="inputPassword3" class="col-sm-2 col-form-label">Student</label>
@@ -171,5 +176,7 @@
     </div>
 
   </form>
+
+</div>
 
 </div>

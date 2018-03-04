@@ -7,7 +7,7 @@
       <span class="input-group-addon" id="query-addon"><i class="fa fa-fw fa-search"></i></span>
       <input class="form-control" ng-model="query" placeholder="Student Name or Crew" />
     </div>
-    <button class="btn btn-default" ng-click="setSort()"><i class="fa fa-fw fa-sort-numeric-asc"></i></button>
+    <button class="btn btn-default no-print" ng-click="setSort()" title="Reset Sort"><i class="fa fa-fw fa-sort-numeric-asc"></i></button>
   </div>
 </form>
 
@@ -19,32 +19,40 @@
     <th><input type="checkbox" ng-model="checkall" ng-click="checkallClick()"></th>
     <th><a ng-click="setSort('LastName', $event)" href="#">Name</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('ReadingTeacher', $event)" href="#">Teacher</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('ReadingGroup', $event)" href="#">Group</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('Crew', $event)" href="#">Crew</a></th>
-    <th><a ng-click="setSort('LastAssessment', $event)" href="#">Last Assessment</a></th>
-    <th class="hidden-xs-down"><a ng-click="setSort('Mastery', $event)" href="#">Mastery</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('Closeness', $event)" href="#">Closeness</a></th>
+    <th><a ng-click="setSort('LastAssessment', $event)" href="#">Last Assessment</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('Level', $event)" href="#">Level</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('Type', $event)" href="#">Type</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('Mastery', $event)" href="#">Mastery</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('Accuracy', $event)" href="#">Accuracy</a></th>
-    <th class="hidden-xs-down"><a ng-click="setSort('Comprehension', $event)" href="#">Comprehension</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('Comprehension', $event)" href="#">Comp.</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('Fluency', $event)" href="#">Fluency</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('Notes', $event)" href="#">Notes</a></th>
   </tr>
   </thead>
   <tbody>
   <tr ng-repeat="student in students | filter: query | orderBy: order">
     <td><input type="checkbox" ng-model="student.selected"></td>
-    <td>{{student['LastName']}}, {{student['FirstName']}}</td>
+    <td><a ui-sref="editAssessment({student: student.id})">{{student['LastName']}}, {{student['FirstName']}}</a></td>
     <td class="hidden-xs-down">{{student.ReadingTeacher}}</td>
+    <td class="hidden-xs-down">{{student.ReadingGroup}}</td>
     <td class="hidden-xs-down">{{student.Crew}}</td>
+    <td class="hidden-xs-down"><strong ng-class="student.Closeness >= 0 ? 'text-success' : 'text-danger'">{{student.Closeness | number:2}}</strong></td>
     <td>
       <a ui-sref="editAssessment({student: student.id})">
         <span ng-if="student['LastAssessment']"><span class="hidden-xs-down">Last:</span> {{student['LastAssessment'] | date:'M/d/yyyy'}}</span>
         <span ng-if="!student['LastAssessment']">+ Create</span>
       </a>
     </td>
+    <td class="hidden-xs-down">{{student['TextLevel']}}</td>
+    <td class="hidden-xs-down">{{student['Type']}}</td>
     <td class="hidden-xs-down">{{student['Mastery']}}</td>
-    <td class="hidden-xs-down"><strong ng-class="student.Closeness >= 0 ? 'text-success' : 'text-danger'">{{student.Closeness | number:2}}</strong></td>
     <td class="hidden-xs-down"><span ng-if="student.Accuracy">{{student['Accuracy']}}%</span></td>
     <td class="hidden-xs-down">{{student['Comprehension']}}</td>
     <td class="hidden-xs-down">{{student['Fluency']}}</td>
+    <td class="hidden-xs-down"><a href="#" ng-if="student.Notes" title="{{student.Notes}}" ng-click="return false;"><i class="fa fa-fw fa-align-left"></i></a></td>
   </tr>
   </tbody>
 </table>
