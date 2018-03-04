@@ -16,7 +16,6 @@ angular.module('app')
       link: function($scope, $element, $attrs, $window) {
 
         $scope.show = false;
-        $scope.showGradeLevelChart = false;
 
         $timeout(function(){
           $scope.link = window.location.href.replace('/admin', '');
@@ -170,16 +169,14 @@ angular.module('app')
         //   $scope.activeColor = color;
         // }
 
-        $scope.toggleGradeLevelChart = function() {
-          $scope.showGradeLevelChart = !$scope.showGradeLevelChart;
-        }
-
         $scope.newAssessment = function() {
           $scope.assessment = {
-            Grade: $scope.student.Grade,
             Student: [$scope.student],
+            Grade: $scope.student.Grade,
             Date: new Date(),
             Type: 'Fiction',
+            TextLevel: '',
+            ExpectedTextLevel: '',
             Accuracy: '',
             Comprehension: '',
             Fluency: '',
@@ -213,6 +210,7 @@ angular.module('app')
 
 
         $scope.updateCloseness = function() {
+          $scope.assessment.TextLevel = $scope.assessment.TextLevel.toUpperCase();
 
           if (!$scope.growth.length || !$scope.assessment.TextLevel || !$scope.assessment.Date) {
             return;
@@ -235,22 +233,20 @@ angular.module('app')
             }
           }
 
-          var key = Math.round((fraction * gradeLevels.length) / gradeLevels.length);
+          var key = Math.round(fraction * gradeLevels.length);
+          console.log('fraction', fraction);
           console.log('key', key, gradeKey);
 
           var expected = 0;
           var current = 0;
           var foundTextLevel = false;
-          $scope.growthLevel = {
-            current: $scope.assessment.TextLevel
-          };
           console.log($scope.growth);
           for (i=0; i<$scope.growth.length; i++) {
             var item = $scope.growth[i];
             if (i < gradeKey + key) {
               console.log(i, item.Growth);
               expected += parseFloat(item.Growth);
-              $scope.growthLevel.expected = item.TextLevel;
+              $scope.assessment.ExpectedTextLevel = item.TextLevel;
             }
             if (!foundTextLevel) {
               current += parseFloat(item.Growth);
@@ -262,7 +258,6 @@ angular.module('app')
 
           $scope.assessment.Closeness = current - expected;
           $scope.assessment.GradeLevel = Math.floor(current);
-
 
           console.log('expected', expected, current);
 
@@ -331,11 +326,14 @@ angular.module('app')
           var last = assessments.pop();
           studentEdit['LastAssessment'] = assessment.Date;
           studentEdit['Closeness'] = assessment.Closeness;
+          studentEdit['Accuracy'] = assessment.Accuracy;
+          studentEdit['Comprehension'] = assessment.Comprehension;
+          studentEdit['Fluency'] = assessment.Fluency;
           studentEdit['Mastery'] = assessment.TextLevel + '/' + assessment.Mastery + '/' + assessment.Type;
           $rootScope.Airtable('Students').update($scope.student.id, studentEdit, function(err, record) {
             if (err) { console.log(err); return; }
             $scope.assessment = null;
-            getStudents();
+            getStudents(calculateQuarters);
           });
         }
 

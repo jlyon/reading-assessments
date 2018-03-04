@@ -11,7 +11,8 @@
 
 angular.module('app', [
   'ui.router',
-  'ngAnimate'
+  'ngAnimate',
+  'chart.js'
 ])
 
   .run(
@@ -83,12 +84,16 @@ angular.module('app', [
               });
 
               $scope.query = '';
-              $scope.order = 'Last+Name';
               $scope.setSort = function(key, e) {
+                if (!key) {
+                  $scope.order = ['LastAssessment', 'Closeness'];
+                  return;
+                }
                 e.preventDefault();
                 key = key.replace(/ /g, '+');
                 $scope.order = $scope.order == key ? '-' + key : key;
               }
+              $scope.setSort();
 
               $scope.checkall = false;
               $scope.checkallClick = function() {
@@ -116,6 +121,70 @@ angular.module('app', [
                   alert('Please select at least one student');
                 }
               }
+
+            }
+          })
+
+        $stateProvider
+          .state("studentsChart", {
+            url: '/admin/students/chart',
+            templateUrl: 'views/students-chart.html',
+            // auth: true,
+            /*resolve: {
+                cards: function ($stateParams, $rootScope, $http) {
+
+                }
+            },*/
+            controller: function ($scope, $rootScope, $state, $filter, $http) {
+              $rootScope.showAdmin = true;
+              $scope.query = null;
+
+              var calculate = function(students) {
+                if ($scope.query && $scope.query.length) {
+                  students = $filter('filter')(students, $scope.query);
+                }
+                console.log(students);
+                var labels = [];
+                var data = [];
+                var colors = [];
+                for (var i=0; i<students.length; i++) {
+                  if (students[i].Closeness) {
+                    labels.push(students[i].FirstName + ' ' + students[i].LastName);
+                    data.push(students[i].Closeness);
+                    colors.push(students[i].Closeness < 0 ? '#f7464a' : '#3c763d'); // red : green
+                  }
+                }
+
+                $scope.labels = labels;
+                $scope.data = data;
+                $scope.colors = colors;
+              }
+
+              var data = [];
+              $rootScope.Airtable('Students').select({
+                sort: [
+                  {field: 'LastName', direction: 'asc'}
+                ]
+              }).eachPage(function page(records, fetchNextPage) {
+                records.forEach(function (record) {
+                  record.fields.id = record.id;
+                  data.push(record.fields);
+                });
+
+                fetchNextPage();
+              }, function done(error) {
+                $scope.students = data;
+                calculate(data);
+                $scope.$apply();
+              });
+
+              $scope.updateQuery = function() {
+                calculate($scope.students, $scope.query);
+              }
+
+
+
+
 
             }
           })

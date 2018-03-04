@@ -13,14 +13,14 @@
   </div>
 </div>
 
-<button ng-click="toggleGradeLevelChart()" class="btn btn-default pull-right" ng-class="showGradeLevelChart ? 'active' : ''">Show Chart</button>
 <h3>At a Glance</h3>
-<img ng-class="!showGradeLevelChart ? 'hide-no-print' : ''" src="images/grade-level-chart.png" alt="Grade level vs text level chart" />
+<img src="images/grade-level-chart.png" class="grade-level-chart" alt="Grade level vs text level chart" />
 <table ng-if="assessments.length" class="table table-striped">
   <thead>
   <tr>
     <th>Quarter</th>
     <th>Level</th>
+    <th>Expected Level</th>
     <th>Mastery</th>
     <th>Grade Band</th>
     <th>Grade Level Closeness</th>
@@ -30,25 +30,27 @@
   <tr ng-repeat="item in quarters">
     <td>{{item.Name}}</td>
     <td>{{item.assessment.TextLevel}}</td>
+    <td>{{item.assessment.ExpectedTextLevel}}</td>
     <td>{{item.assessment.Mastery}}</td>
-    <td>{{item.assessment.GradeLevel}}</td>
-    <td><strong ng-class="item.Closeness >= 0 ? 'text-success' : 'text-danger'">{{item.assessment.Closeness | number:2}}</strong></td>
+    <td>{{item.assessment.GradeLevel === 0 ? 'K' : item.assessment.GradeLevel}}</td>
+    <td><strong ng-class="item.assessment.Closeness >= 0 ? 'text-success' : 'text-danger'">{{item.assessment.Closeness | number:2}}</strong></td>
   </tr>
   </tbody>
 </table>
 
 <hr/>
 <h3>All Assessments</h3>
-<p ng-f="!assessments.length">No assessments have been created for {{student['FirstName']}} {{student['LastName']}}.</p>
+<p ng-if="!assessments.length">No assessments have been created for {{student['FirstName']}} {{student['LastName']}}.</p>
 <table ng-if="assessments.length" class="table table-striped">
   <thead>
   <tr>
     <th>Date</th>
-    <th>Text Level</th>
+    <th>Level</th>
+    <th>Expected Level</th>
     <th>Type</th>
-    <th>Accuracy</th>
-    <th>Comprehension</th>
-    <th>Fluency</th>
+    <th ng-if="edit" class="no-print">Accuracy</th>
+    <th ng-if="edit" class="no-print">Comprehension</th>
+    <th ng-if="edit" class="no-print">Fluency</th>
     <th>Mastery</th>
     <th>Grade-level Closeness</th>
   </tr>
@@ -57,10 +59,11 @@
   <tr ng-repeat="item in assessments">
     <td>{{item.Date | date:'MMMM d yyyy'}}</td>
     <td>{{item.TextLevel}}</td>
+    <td>{{item.ExpectedTextLevel}}</td>
     <td>{{item.Type}}</td>
-    <td>{{item.Accuracy}}</td>
-    <td>{{item.Comprehension}}</td>
-    <td>{{item.Fluency}}</td>
+    <td ng-if="edit" class="no-print"><span ng-if="item.Accuracy">{{item.Accuracy}}%</span></td>
+    <td ng-if="edit" class="no-print">{{item.Comprehension}}</td>
+    <td ng-if="edit" class="no-print">{{item.Fluency}}</td>
     <td>{{item.Mastery}}</td>
     <td><strong ng-class="item.Closeness >= 0 ? 'text-success' : 'text-danger'">{{item.Closeness | number:2}}</strong></td>
   </tr>
@@ -71,8 +74,8 @@
   <button class="btn btn-primary" ng-click="newAssessment()"><i class="fa fa-fw fa-plus-circle"></i>Create New Assessment</button>
 </p>
 
-<div ng-if="assessment.Date">
-  <form class="assessment no-print">
+<div ng-if="assessment.Date" class="assessment-form">
+  <form class="assessment  no-print">
     <h3>Create New Assessment</h3>
     <hr/>
     <div class="form-group row">
@@ -113,9 +116,9 @@
       <label for="Closeness" class="col-sm-2 col-form-label">Grade-level Closeness</label>
       <div class="col-sm-10">
         <div ng-class="assessment.Closeness >= 0 ? 'text-success' : 'text-danger'"><strong>{{assessment.Closeness | number:2}}</strong></div>
-        <div ng-if="growthLevel">
-          <div>Current: {{growthLevel.current}}</div>
-          <div>Expected: {{growthLevel.expected}}</div>
+        <div ng-if="assessment.ExpectedTextLevel">
+          <div>Current: {{assessment.TextLevel}}</div>
+          <div>Expected: {{assessment.ExpectedTextLevel}}</div>
         </div>
       </div>
     </div>
@@ -123,7 +126,10 @@
     <div class="form-group row">
       <label for="Accuracy" class="col-sm-2 col-form-label">Accuracy</label>
       <div class="col-sm-10">
-        <input type="number" class="form-control" ng-model="assessment.Accuracy" id="Accuracy">
+        <div class="input-group">
+          <input type="number" class="form-control" ng-model="assessment.Accuracy" id="Accuracy">
+          <span class="input-group-addon" id="Accuracy-addon">%</span>
+        </div>
       </div>
     </div>
     <div class="form-group row">

@@ -5,11 +5,13 @@ body {
 h1 {
   margin-bottom: .5em; }
 
-img {
-  max-width: 100%; }
+img.grade-level-chart {
+  max-width: 100%;
+  margin-bottom: 1em; }
 
-input,
-select {
+.assessment-form input,
+.assessment-form select,
+.assessment-form .input-group {
   max-width: 200px; }
 
 .hide-no-print {

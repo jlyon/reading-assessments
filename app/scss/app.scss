@@ -9,14 +9,20 @@ body {
 h1 {
   margin-bottom: .5em;
 }
-img {
+img.grade-level-chart {
   max-width: 100%;
+  margin-bottom: 1em;
 }
 
-input,
-select {
-  max-width: 200px;
+
+.assessment-form {
+  input,
+  select,
+  .input-group {
+    max-width: 200px;
+  }
 }
+
 
 
 .assessment {
