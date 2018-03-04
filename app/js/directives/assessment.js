@@ -197,6 +197,7 @@ angular.module('app')
           var expected = 0;
           var current = 0;
           var foundTextLevel = false;
+          var expectedTextLevel = null;
           console.log($scope.growth);
           for (i=0; i<$scope.growth.length; i++) {
             var item = $scope.growth[i];
