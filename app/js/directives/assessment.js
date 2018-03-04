@@ -138,9 +138,9 @@ angular.module('app')
             Genre: 'Fiction',
             TextLevel: '',
             ExpectedTextLevel: '',
-            Accuracy: '',
-            Comprehension: '',
-            Fluency: '',
+            Accuracy: null,
+            Comprehension: null,
+            Fluency: null,
             Mastery: 'Hard',
             Closeness: '',
             Notes: ''
