@@ -205,8 +205,10 @@ angular.module('app')
           console.log($scope.growth);
           for (i=0; i<$scope.growth.length; i++) {
             var item = $scope.growth[i];
-            if (i < gradeKey + key) {
+            if (i < gradeKey + key - 1) {
               expected += parseFloat(item.Growth);
+            }
+            if (i < gradeKey + key) {
               expectedTextLevel = item.TextLevel;
             }
             if (item.TextLevel == $scope.assessment.TextLevel) {
