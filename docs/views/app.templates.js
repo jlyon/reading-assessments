@@ -12,7 +12,7 @@ angular.module('311AppParent').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/students-chart.html',
-    "<form class=\"form-inline\"><div class=\"form-group\"><div class=\"input-group\"><span class=\"input-group-addon\" id=\"query-addon\"><i class=\"fa fa-fw fa-search\"></i></span> <input class=\"form-control\" ng-model=\"query\" placeholder=\"Student Name or Crew\" ng-change=\"updateQuery()\"></div><span ng-if=\"query\">&nbsp;<strong>{{data.length}}</strong> students matching \"{{query}}\"</span></div></form><hr><h2 class=\"text-center\">Student Closeness</h2><canvas id=\"base\" class=\"chart-horizontal-bar\" chart-data=\"data\" chart-labels=\"labels\" chart-colors=\"colors\"></canvas>"
+    "<form class=\"form-inline\"><div class=\"form-group\"><div class=\"input-group\"><span class=\"input-group-addon\" id=\"query-addon\"><i class=\"fa fa-fw fa-search\"></i></span> <input class=\"form-control\" ng-model=\"query\" placeholder=\"Student Name or Crew\" ng-change=\"updateQuery()\"></div><span ng-if=\"query\">&nbsp;<strong>{{data.length}}</strong> students matching \"{{query}}\"</span></div></form><hr><h2 class=\"text-center\">Student Closeness</h2><canvas id=\"base\" class=\"chart-horizontal-bar\" chart-data=\"data\" chart-labels=\"labels\" chart-colors=\"colors\" height=\"300\"></canvas>"
   );
 
 
