@@ -148,8 +148,8 @@ angular.module('app', [
                 var data = [];
                 var colors = [];
                 for (var i=0; i<students.length; i++) {
-                  if (students[i].Closeness) {
-                    labels.push(students[i].FirstName + ' ' + students[i].LastName);
+                  if (students[i].Closeness != null) {
+                    labels.push(students[i].FirstName + ' ' + students[i].LastName + ' ' + students[i].LastAssessment);
                     data.push(students[i].Closeness);
                     colors.push(students[i].Closeness < 0 ? '#f7464a' : '#3c763d'); // red : green
                   }
@@ -163,7 +163,7 @@ angular.module('app', [
               var data = [];
               $rootScope.Airtable('Students').select({
                 sort: [
-                  {field: 'LastName', direction: 'asc'}
+                  {field: 'LastAssessment', direction: 'asc'}
                 ]
               }).eachPage(function page(records, fetchNextPage) {
                 records.forEach(function (record) {
