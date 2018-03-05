@@ -48,6 +48,7 @@ angular.module('app')
           var quarters = $scope.quarters;
           var last = 0;
           for (var i=0; i<quarters.length; i++) {
+            quarters[i].assessment = null;
             for (var j=last; j<assessments.length; j++) {
               console.log(assessments[j].Date, quarters[i].LastDay)
               if (assessments[j].Date <= quarters[i].LastDay && assessments[j].Mastery !== 'Hard') {
@@ -236,6 +237,16 @@ angular.module('app')
           $scope.assessment = null;
         }
 
+        $scope.deleteAssessment = function(id) {
+          $rootScope.Airtable('Assessments').destroy(id, function(err, record) {
+            if (err) { alert('There was a problem deleting this assessment!');console.error(err); return; }
+            $scope.assessment = null;
+            getStudents(saveAssessmentCallback, null);
+          });
+        }
+
+
+
         $scope.saveAssessment = function(assessment) {
           if (assessment.id) {
             var id = assessment.id;
@@ -271,8 +282,6 @@ angular.module('app')
         }
 
         var saveAssessmentLoadedCallback = function(assessment, assessments) {
-          calculateQuarters(assessment, assessments);
-
           // Get the last assessment
           assessment = assessments[assessments.length - 1];
 
@@ -290,6 +299,7 @@ angular.module('app')
           studentEdit['AnnualGrowth'] = assessment.GrowthLevel === null ? null : assessment.GrowthLevel - assessments[0].GrowthLevel;
           $rootScope.Airtable('Students').update($scope.student.id, studentEdit, function(err, record) {
             if (err) { console.log(err); return; }
+            calculateQuarters(assessment, assessments);
             $scope.assessment = null;
           });
 

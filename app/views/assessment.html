@@ -175,6 +175,7 @@
       <label for="" class="col-sm-2 col-form-label"></label>
       <div class="col-sm-10">
         <button class="btn btn-primary" ng-click="saveAssessment(assessment)"><i class="fa fa-fw fa-floppy-o"></i>Save</button>
+        <button ng-if="assessment.id" class="btn btn-danger" ng-click="deleteAssessment(assessment.id)"><i class="fa fa-fw fa-trash"></i>Delete</button>
         <button class="btn" ng-click="cancelAssessment()">Cancel</button>
       </div>
     </div>
