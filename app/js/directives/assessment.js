@@ -50,7 +50,7 @@ angular.module('app')
           for (var i=0; i<quarters.length; i++) {
             for (var j=last; j<assessments.length; j++) {
               console.log(assessments[j].Date, quarters[i].LastDay)
-              if (assessments[j].Date <= quarters[i].LastDay) {
+              if (assessments[j].Date <= quarters[i].LastDay && assessments[j].Mastery !== 'Hard') {
                 quarters[i].assessment = assessments[j];
                 last = i+1;
               }
@@ -141,7 +141,7 @@ angular.module('app')
             Accuracy: null,
             Comprehension: null,
             Fluency: null,
-            Mastery: 'Hard',
+            Mastery: 'Instructional',
             Closeness: '',
             Notes: ''
           };
@@ -169,7 +169,11 @@ angular.module('app')
         $scope.updateCloseness = function() {
           $scope.assessment.TextLevel = $scope.assessment.TextLevel.toUpperCase();
 
-          if (!$scope.growth.length || !$scope.assessment.TextLevel || !$scope.assessment.Date) {
+          if (!$scope.growth.length || !$scope.assessment.TextLevel || !$scope.assessment.Date || !$scope.assessment.Mastery|| $scope.assessment.Mastery === 'Hard') {
+            $scope.assessment.GrowthLevel = null;
+            $scope.assessment.Closeness = null;
+            $scope.assessment.GradeLevel = null;
+            $scope.assessment.ExpectedTextLevel = null;
             return;
           }
 
@@ -202,18 +206,21 @@ angular.module('app')
           for (i=0; i<$scope.growth.length; i++) {
             var item = $scope.growth[i];
             if (i < gradeKey + key) {
-              console.log(i, item.Growth);
               expected += parseFloat(item.Growth);
               expectedTextLevel = item.TextLevel;
-            }
-            if (!foundTextLevel) {
-              current += parseFloat(item.Growth);
             }
             if (item.TextLevel == $scope.assessment.TextLevel) {
               foundTextLevel = item;
             }
+            if (!foundTextLevel) {
+              current += parseFloat(item.Growth);
+            }
           }
 
+          // If Mastery is Hard they are really one step back
+          if ($scope.assessment.Mastery === 'Hard') {
+            current -= foundTextLevel.Growth;
+          }
           $scope.assessment.GrowthLevel = current;
           $scope.assessment.Closeness = current - expected;
           $scope.assessment.GradeLevel = parseInt(foundTextLevel.GradeLevel);
@@ -278,7 +285,7 @@ angular.module('app')
           studentEdit['Mastery'] = assessment.Mastery;
           studentEdit['TextLevel'] = assessment.TextLevel;
           studentEdit['Genre'] = assessment.Genre;
-          studentEdit['AnnualGrowth'] = assessment.GrowthLevel - assessments[0].GrowthLevel;
+          studentEdit['AnnualGrowth'] = assessment.GrowthLevel === null ? null : assessment.GrowthLevel - assessments[0].GrowthLevel;
           $rootScope.Airtable('Students').update($scope.student.id, studentEdit, function(err, record) {
             if (err) { console.log(err); return; }
             $scope.assessment = null;
