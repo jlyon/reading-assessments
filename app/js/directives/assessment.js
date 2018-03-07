@@ -50,16 +50,14 @@ angular.module('app')
           for (var i=0; i<quarters.length; i++) {
             quarters[i].assessment = null;
             for (var j=last; j<assessments.length; j++) {
-              console.log(assessments[j].Date, quarters[i].LastDay)
               if (assessments[j].Date <= quarters[i].LastDay && assessments[j].Mastery !== 'Hard') {
                 quarters[i].assessment = assessments[j];
-                last = i+1;
+                last = j+1;
               }
             }
           }
           $scope.quarters = quarters;
           $scope.$apply();
-          console.log('quarters', quarters);
         }
 
         var getStudents = function(cb, assessment) {
@@ -271,7 +269,7 @@ angular.module('app')
                 return;
               }
               $scope.assessment = null;
-              getStudents(saveAssessmentCallback, assessment);
+              getStudents(saveAssessmentCallback, assessments);
             });
           }
 
@@ -282,8 +280,14 @@ angular.module('app')
         }
 
         var saveAssessmentLoadedCallback = function(assessment, assessments) {
-          // Get the last assessment
+          // Get the last non-Hard assessment
           assessment = assessments[assessments.length - 1];
+          if (assessment.Mastery === 'Hard' && assessments.length > 1) {
+            assessment = assessments[assessments.length - 2];
+          }
+          if (assessment.Mastery === 'Hard' && assessments.length > 2) {
+            assessment = assessments[assessments.length - 3];
+          }
 
           var studentEdit = {};
           studentEdit['LastAssessment'] = assessment.Date;
