@@ -118,7 +118,7 @@ angular.module('app', [
                   $state.go('printAssessment', {students: students.join(',')});
                 }
                 else {
-                  alert('Please select at least one student');
+                  //alert('Please select at least one student');
                 }
               }
 

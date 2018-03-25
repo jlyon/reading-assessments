@@ -9,10 +9,28 @@ body {
 h1 {
   margin-bottom: .5em;
 }
-img.grade-level-chart {
+
+.assessment-wrapper {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+img.grade-level-chart,
+table.quarters{
   max-width: 100%;
-  width: 900px;
+  width: 100%;
+}
+
+img.grade-level-chart {
   margin-bottom: 1em;
+}
+
+.reading-progress-chart-wrapper {
+  .reading-progress-chart {
+    width: 100%;
+    height: 300px;
+    marign-top: 10px;
+  }
 }
 
 

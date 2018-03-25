@@ -14,13 +14,12 @@
 
 <h3>At a Glance</h3>
 <img src="images/grade-level-chart.png" class="grade-level-chart" alt="Grade level vs text level chart" />
-<table ng-if="assessments.length" class="table table-striped quart">
+<table ng-if="assessments.length" class="table table-striped quarters">
   <thead>
   <tr>
     <th>Quarter</th>
     <th>Level</th>
     <th>Expected</th>
-    <th>Mastery</th>
     <th>Grade Band</th>
     <th>Growth</th>
   </tr>
@@ -30,14 +29,23 @@
     <td>{{item.Name}}</td>
     <td>{{item.assessment.TextLevel}}</td>
     <td>{{item.assessment.ExpectedTextLevel}}</td>
-    <td>{{item.assessment.Mastery}}</td>
     <td>{{item.assessment.GradeLevel === 0 ? 'K' : item.assessment.GradeLevel}}</td>
     <td><span ng-if="item.assessment.GrowthLevel">{{item.assessment.GrowthLevel - assessments[0].GrowthLevel | number:2}}</span></td>
   </tr>
   </tbody>
 </table>
 
-<hr/>
+<hr />
+
+<div ng-class="showChart ? '' : 'hidden'">
+  <button class="btn btn-default pull-right no-print" ng-click="toggleChart()"><i class="fa fa-fw fa-times"></i>Hide</button>
+  <h3>Reading Progress</h3>
+  <div class="reading-progress-chart-wrapper">
+    <div id="chart_div" class="reading-progress-chart"></div>
+  </div>
+  <hr />
+</div>
+
 <div ng-if="showAllAssessments">
   <button class="btn btn-default pull-right no-print" ng-click="toggleAllAssessments()"><i class="fa fa-fw fa-times"></i>Hide</button>
   <h3>All Assessments</h3>
@@ -49,11 +57,11 @@
       <th>Level</th>
       <th>Expected</th>
       <th>Genre</th>
+      <th>Mastery</th>
       <th ng-if="edit" class="no-print">Accuracy</th>
       <th ng-if="edit" class="no-print">Comp.</th>
       <th ng-if="edit" class="no-print">Fluency</th>
-      <th>Mastery</th>
-      <th>Grade-level Closeness</th>
+      <th>Closeness</th>
       <th>Growth</th>
       <th class="hidden-xs-down no-print">Notes</th>
     </tr>
@@ -64,10 +72,10 @@
       <td>{{item.TextLevel}}</td>
       <td>{{item.ExpectedTextLevel}}</td>
       <td>{{item.Genre}}</td>
+      <td>{{item.Mastery}}</td>
       <td ng-if="edit" class="no-print"><span ng-if="item.Accuracy">{{item.Accuracy}}%</span></td>
       <td ng-if="edit" class="no-print">{{item.Comprehension}}</td>
       <td ng-if="edit" class="no-print">{{item.Fluency}}</td>
-      <td>{{item.Mastery}}</td>
       <td><strong ng-class="item.Closeness >= 0 ? 'text-success' : 'text-danger'">{{item.Closeness | number:2}}</strong></td>
       <td class="hidden-xs-down"><span ng-if="item.GrowthLevel">{{item.GrowthLevel - assessments[0].GrowthLevel | number:2}}</span></td>
       <td class="hidden-xs-down no-print">{{item.Notes}}</td>
@@ -77,32 +85,33 @@
 </div>
 
 <p class="no-print">
-  <button ng-if="!showAllAssessments" class="btn btn-primary" ng-click="toggleAllAssessments()"><i class="fa fa-fw fa-info-circle"></i>See All Assessments</button>
+  <button ng-if="!showChart" class="btn btn-default" ng-click="toggleChart()"><i class="fa fa-fw fa-line-chart"></i>Show Chart</button>
+  <button ng-if="!showAllAssessments" class="btn btn-default" ng-click="toggleAllAssessments()"><i class="fa fa-fw fa-info-circle"></i>See All Assessments</button>
   <button ng-if="!assessment && edit" class="btn btn-primary" ng-click="newAssessment()"><i class="fa fa-fw fa-plus-circle"></i>Create New Assessment</button>
 </p>
 
 <div ng-if="assessment.Date" class="assessment-form">
-  <form class="assessment  no-print">
+  <form class="assessment no-print" id="assessment">
     <hr/>
     <h3 ng-if="!assessment.id">Create New Assessment</h3>
     <h3 ng-if="assessment.id">Edit Assessment</h3>
     <hr/>
     <div class="form-group row">
-      <label for="inputPassword3" class="col-sm-2 col-form-label">Student</label>
+      <label class="col-sm-2 col-form-label">Student</label>
       <div class="col-sm-10">
         {{student['FirstName']}} {{student['LastName']}}
       </div>
     </div>
     <div class="form-group row">
-      <label for="inputPassword3" class="col-sm-2 col-form-label">Grade Level</label>
+      <label class="col-sm-2 col-form-label">Grade Level</label>
       <div class="col-sm-10">
         {{student['Grade']}}
       </div>
     </div>
     <div class="form-group row">
-      <label for="inputEmail3" class="col-sm-2 col-form-label">Date</label>
+      <label for="date" class="col-sm-2 col-form-label">Date</label>
       <div class="col-sm-10">
-        <input type="date" class="form-control" ng-model="assessment.Date" required="required">
+        <input id="date" type="date" class="form-control" ng-model="assessment.Date" required="required">
       </div>
     </div>
     <hr/>
@@ -112,13 +121,14 @@
         <select class="form-control" ng-model="assessment.Genre" id="type" required="required">
           <option>Fiction</option>
           <option>Non-fiction</option>
+          <option value="">N/A</option>
         </select>
       </div>
     </div>
     <div class="form-group row">
-      <label for="inputPassword3" class="col-sm-2 col-form-label">Text Level</label>
+      <label for="level" class="col-sm-2 col-form-label">Text Level</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" ng-model="assessment.TextLevel" ng-change="updateCloseness()">
+        <input id="level" type="text" class="form-control" ng-model="assessment.TextLevel" ng-change="updateCloseness()">
       </div>
     </div>
     <div class="form-group row">
@@ -128,6 +138,7 @@
           <option>Independent</option>
           <option>Instructional</option>
           <option>Hard</option>
+          <option>Placement</option>
         </select>
       </div>
     </div>
