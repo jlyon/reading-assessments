@@ -157,15 +157,24 @@ angular.module('app')
             }
 
             // Add assessments
+            var lastDate = null;
+            var rows = [];
             for (i=0; i<$scope.assessments.length; i++) {
               if ($scope.assessments[i].Mastery !== 'Hard' && $scope.assessments[i].Mastery !== 'Placement') {
-                data.addRow([
-                  new Date($scope.assessments[i].Date),
-                  $rootScope.getNumericalReadingLevel($scope.assessments[i].TextLevel),
-                  null
-                ]);
+                var date = new Date($scope.assessments[i].Date);
+                var level = $rootScope.getNumericalReadingLevel($scope.assessments[i].TextLevel);
+                if (rows.length != 0 && rows[rows.length - 1][0].getTime() === date.getTime()) {
+                  rows[rows.length - 1][1] = rows[rows.length - 1][1] > level ? rows[rows.length - 1][1] : level;
+                } else {
+                  rows.push([
+                    date,
+                    level,
+                    null
+                  ]);
+                }
               }
             }
+            data.addRows(rows);
 
             var options = {
               // vAxis: {

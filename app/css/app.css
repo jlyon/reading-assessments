@@ -52,7 +52,9 @@ img.grade-level-chart {
   .assessment {
     page-break-after: always; }
   .list-group-item {
-    max-width: 400px; } }
+    max-width: 400px; }
+  table {
+    font-size: 1.4em; } }
 
 @media (max-width: 600px) {
   .hidden-xs-down {
