@@ -49,7 +49,7 @@ angular.module('app')
           var quarters = $scope.quarters;
           var last = 0;
           for (var i=0; i<quarters.length; i++) {
-            quarters[i].expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student.Grade, quarters[i].LastDay);
+            quarters[i].expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student.Grade, new Date(quarters[i].LastDay));
             quarters[i].assessment = null;
             for (var j=last; j<assessments.length; j++) {
               if (assessments[j].Date <= quarters[i].LastDay && assessments[j].Mastery !== 'Hard') {
@@ -247,7 +247,7 @@ angular.module('app')
           }
 
           var current = $rootScope.getNumericalReadingLevel($scope.assessment.TextLevel);
-          var expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student, $scope.assessment.Date, $scope.assessment.Mastery);
+          var expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student, new Date($scope.assessment.Date), $scope.assessment.Mastery);
           var expected = $rootScope.getNumericalReadingLevel(expectedTextLevel);
 
           $scope.assessment.GrowthLevel = current;

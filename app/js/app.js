@@ -62,7 +62,8 @@ angular.module('app', [
 
           // Get % of school-year that is complete
           // Note: months are -1 what you expect so 7 = August, 5 = June
-          var now = new Date(date);
+          var now = date;
+          console.log(now);
           var start  = new Date(now.getFullYear(), 7, 14);
           start = start > now ? new Date(now.getFullYear() - 1 , 7, 14) : start;
           var end = new Date(start.getFullYear() + 1, 5, 14);
@@ -156,11 +157,12 @@ angular.module('app', [
 
                 fetchNextPage();
               }, function done(error) {
+                var now = new Date();
                 for (var i=0; i<data.length; i++) {
-                  var expected = $rootScope.getExpectedTextLevel($scope.growth, data[i].Grade, data[i]);
+                  var expected = $rootScope.getExpectedTextLevel(data[i].Grade, now);
                   expected = $rootScope.getNumericalReadingLevel(expected);
                   var current = $rootScope.getNumericalReadingLevel(data[i].TextLevel);
-                  data[i].Closeness = expected - current;
+                  data[i].Closeness = current - expected;
                 }
                 $scope.students = data;
                 $scope.$apply();
