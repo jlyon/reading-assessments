@@ -144,7 +144,7 @@ angular.module('app')
 
             // Add expected values, starting with one for the beginning of the year
             data.addRow([
-              new Date($scope.assessments[0].Date.replace('10', '08')),
+              new Date($scope.quarters[0].LastDay.replace('10', '08')),
               null,
               parseInt($scope.student.Grade)
             ]);
@@ -157,7 +157,7 @@ angular.module('app')
             }
 
             // Add assessments
-            for (var i=0; i<$scope.assessments.length; i++) {
+            for (i=0; i<$scope.assessments.length; i++) {
               if ($scope.assessments[i].Mastery !== 'Hard' && $scope.assessments[i].Mastery !== 'Placement') {
                 data.addRow([
                   new Date($scope.assessments[i].Date),
