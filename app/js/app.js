@@ -28,6 +28,83 @@ angular.module('app', [
         var Airtable = require('airtable');
         $rootScope.Airtable = new Airtable({apiKey: 'keyNIbNk17BU31gT8'}).base('appA1AUk2jnO8Xmzt');
 
+        // Get the GrowthCalculator table
+        var items1 = [];
+        $rootScope.Airtable('GrowthCalculator').select({
+          sort: [
+            {field: 'ID', direction: 'asc'}
+          ]
+        }).eachPage(function page(records, fetchNextPage1) {
+          records.forEach(function (record) {
+            record.fields.id = record.id;
+            items1.push(record.fields);
+          });
+          fetchNextPage1();
+        }, function done(error) {
+          $rootScope.growth = items1;
+        });
+
+        // Helper function turns "C" (etc) into a number
+        $rootScope.getNumericalReadingLevel = function(textLevel) {
+          var num = 0;
+          for (var i=0; i<$rootScope.growth.length; i++) {
+            if ($rootScope.growth[i].TextLevel == textLevel) {
+              break;
+            }
+            num += parseFloat($rootScope.growth[i].Growth);
+          }
+          return num;
+        }
+
+        // Helper functions calculates where we are expected to be at a given date
+        // formula: {grade level} + {time of year} - {grade level equiv}
+        $rootScope.getExpectedTextLevel = function(gradeLevel, date, mastery) {
+
+          // Get % of school-year that is complete
+          // Note: months are -1 what you expect so 7 = August, 5 = June
+          var now = new Date(date);
+          var start  = new Date(now.getFullYear(), 7, 14);
+          start = start > now ? new Date(now.getFullYear() - 1 , 7, 14) : start;
+          var end = new Date(start.getFullYear() + 1, 5, 14);
+          var fraction = (now - start)/(end - start);
+
+          var gradeLevels = [];
+          var gradeKey = null;
+          for (var i=0; i<$rootScope.growth.length; i++) {
+            if ($rootScope.growth[i].GradeLevel == gradeLevel) {
+              gradeKey = gradeKey ? gradeKey : i;
+              gradeLevels.push($rootScope.growth[i]);
+            }
+          }
+
+          var key = Math.round(fraction * gradeLevels.length);
+
+          // If Mastery is Hard they are really one step back
+          // @todo: is this correct?
+          if (mastery != undefined && mastery === 'Hard') {
+            key --;
+          }
+
+          console.log('fraction', fraction);
+
+          //var foundTextLevel = false;
+          var expectedTextLevel = null;
+          for (i=0; i<$rootScope.growth.length; i++) {
+            var item = $rootScope.growth[i];
+            // if (i < gradeKey + key - 1) {
+            //   expected += parseFloat(item.Growth);
+            // }
+            if (i < gradeKey + key) {
+              expectedTextLevel = item.TextLevel;
+            }
+            // if (item.TextLevel == $scope.assessment.TextLevel) {
+            //   foundTextLevel = item;
+            // }
+          }
+
+          return expectedTextLevel;
+        };
+
 
       }
     ]
@@ -79,6 +156,12 @@ angular.module('app', [
 
                 fetchNextPage();
               }, function done(error) {
+                for (var i=0; i<data.length; i++) {
+                  var expected = $rootScope.getExpectedTextLevel($scope.growth, data[i].Grade, data[i]);
+                  expected = $rootScope.getNumericalReadingLevel(expected);
+                  var current = $rootScope.getNumericalReadingLevel(data[i].TextLevel);
+                  data[i].Closeness = expected - current;
+                }
                 $scope.students = data;
                 $scope.$apply();
               });

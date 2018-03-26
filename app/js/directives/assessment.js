@@ -49,6 +49,7 @@ angular.module('app')
           var quarters = $scope.quarters;
           var last = 0;
           for (var i=0; i<quarters.length; i++) {
+            quarters[i].expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student.Grade, quarters[i].LastDay);
             quarters[i].assessment = null;
             for (var j=last; j<assessments.length; j++) {
               if (assessments[j].Date <= quarters[i].LastDay && assessments[j].Mastery !== 'Hard') {
@@ -57,6 +58,7 @@ angular.module('app')
               }
             }
           }
+          console.log('quarters', quarters);
           $scope.quarters = quarters;
           $scope.$apply();
           drawChart();
@@ -71,7 +73,7 @@ angular.module('app')
             $scope.$apply();
 
             var assessments = [];
-            var disabledItems = {};
+            //var disabledItems = {};
             $rootScope.Airtable('Assessments').select({
               filterByFormula: '{Student} = "' + record.fields.ID + '"',
               sort: [
@@ -156,11 +158,13 @@ angular.module('app')
 
             // Add assessments
             for (var i=0; i<$scope.assessments.length; i++) {
-              data.addRow([
-                new Date($scope.assessments[i].Date),
-                getNumericalReadingLevel($scope.assessments[i].TextLevel),
-                null
-              ]);
+              if ($scope.assessments[i].Mastery !== 'Hard' && $scope.assessments[i].Mastery !== 'Placement') {
+                data.addRow([
+                  new Date($scope.assessments[i].Date),
+                  $rootScope.getNumericalReadingLevel($scope.assessments[i].TextLevel),
+                  null
+                ]);
+              }
             }
 
             var options = {
@@ -171,73 +175,13 @@ angular.module('app')
                 1: {curveType: 'function'},
                 2: {curveType: 'function'}
               },
-              'chartArea': {left: 30, top: 10, 'width': '80%', 'height': '90%'},
+              'chartArea': {left: 40, top: 10, 'width': '80%', 'height': '90%'},
               'legend': {'position': 'top right'}
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
             chart.draw(data, options);
           }
-        }
-
-        function getNumericalReadingLevel(textLevel) {
-          var num = 0;
-          for (var i=0; i<$scope.growth.length; i++) {
-            if ($scope.growth[i].TextLevel == textLevel) {
-              break;
-            }
-            num += parseFloat($scope.growth[i].Growth);
-          }
-          return num;
-        }
-
-        function getExpectedReadingLevel(date, mastery) {
-          // formula: {grade level} + {time of year} - {grade level equiv}
-
-          // Get % of school-year that is complete
-          // Note: months are -1 what you expect so 7 = August, 5 = June
-          var now = new Date(date);
-          var start  = new Date(now.getFullYear(), 7, 14);
-          start = start > now ? new Date(now.getFullYear() - 1 , 7, 14) : start;
-          var end = new Date(start.getFullYear() + 1, 5, 14);
-          var fraction = (now - start)/(end - start);
-
-          var gradeLevels = [];
-          var gradeKey = null;
-          for (var i=0; i<$scope.growth.length; i++) {
-            if ($scope.growth[i].GradeLevel == $scope.student.Grade) {
-              gradeKey = gradeKey ? gradeKey : i;
-              gradeLevels.push($scope.growth[i]);
-            }
-          }
-
-          var key = Math.round(fraction * gradeLevels.length);
-
-          // If Mastery is Hard they are really one step back
-          if (mastery === 'Hard') {
-            key --;
-          }
-
-          console.log('fraction', fraction);
-          console.log('key', key, gradeKey);
-
-          //var foundTextLevel = false;
-          var expectedTextLevel = null;
-          console.log($scope.growth);
-          for (i=0; i<$scope.growth.length; i++) {
-            var item = $scope.growth[i];
-            // if (i < gradeKey + key - 1) {
-            //   expected += parseFloat(item.Growth);
-            // }
-            if (i < gradeKey + key) {
-              expectedTextLevel = item.TextLevel;
-            }
-            // if (item.TextLevel == $scope.assessment.TextLevel) {
-            //   foundTextLevel = item;
-            // }
-          }
-
-          return expectedTextLevel;
         }
 
         $scope.toggleAllAssessments = function() {
@@ -302,9 +246,9 @@ angular.module('app')
             return;
           }
 
-          var current = getNumericalReadingLevel($scope.assessment.TextLevel);
-          var expectedTextLevel = getExpectedReadingLevel($scope.assessment.Date, $scope.assessment.Mastery);
-          var expected = getNumericalReadingLevel(expectedTextLevel);
+          var current = $rootScope.getNumericalReadingLevel($scope.assessment.TextLevel);
+          var expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student, $scope.assessment.Date, $scope.assessment.Mastery);
+          var expected = $rootScope.getNumericalReadingLevel(expectedTextLevel);
 
           $scope.assessment.GrowthLevel = current;
           $scope.assessment.Closeness = current - expected;
