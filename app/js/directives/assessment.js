@@ -49,7 +49,14 @@ angular.module('app')
           var quarters = $scope.quarters;
           var last = 0;
           for (var i=0; i<quarters.length; i++) {
-            quarters[i].expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student.Grade, new Date(quarters[i].LastDay));
+
+            // This is a hack to support the last quarter showing the first Level of the next year.
+            // (for all grades but Kinder)
+            var automaticallyAdd = (i == quarters.length - 1 && $scope.student.Grade != 0) ? 1 : 0;
+
+            quarters[i].expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student.Grade, new Date(quarters[i].LastDay), null, automaticallyAdd);
+
+            // Add assessments
             quarters[i].assessment = null;
             for (var j=last; j<assessments.length; j++) {
               if (assessments[j].Date <= quarters[i].LastDay && assessments[j].Mastery !== 'Hard') {
@@ -57,8 +64,9 @@ angular.module('app')
                 last = j+1;
               }
             }
+
           }
-          console.log('quarters', quarters);
+          //console.log('quarters', quarters);
           $scope.quarters = quarters;
           $scope.$apply();
           drawChart();
@@ -286,7 +294,7 @@ angular.module('app')
             delete assessment.id;
             delete assessment.ID;
             delete assessment['$$hashKey'];
-            console.log('Update assessment', assessment);
+            //console.log('Update assessment', assessment);
             $rootScope.Airtable('Assessments').update(id, assessment, function(err, record) {
               if (err) { alert('There was a problem saving this assessment!');console.error(err); return; }
               $scope.assessment = null;
@@ -296,7 +304,7 @@ angular.module('app')
           else {
             assessment.Date = new Date(assessment.Date).toISOString().slice(0, 10);
             assessment.Student[0] = typeof assessment.Student[0] == 'object' ? assessment.Student[0].id : assessment.Student[0];
-            console.log('Create assessment', assessment);
+            //console.log('Create assessment', assessment);
             $rootScope.Airtable('Assessments').create(assessment, function (err, record) {
               if (err) {
                 alert('There was a problem saving this assessment!');
@@ -339,7 +347,7 @@ angular.module('app')
           studentEdit['TextLevel'] = assessment.TextLevel !== undefined ? assessment.TextLevel : null;
           studentEdit['Genre'] = assessment.Genre !== undefined ? assessment.Genre : null;
           studentEdit['AnnualGrowth'] = assessment.GrowthLevel === undefined || assessment.GrowthLevel === null ? null : assessment.GrowthLevel - assessments[0].GrowthLevel;
-          console.log('saving', studentEdit);
+          //console.log('saving', studentEdit);
           $rootScope.Airtable('Students').update($scope.student.id, studentEdit, function(err, record) {
             if (err) { console.log(err);alert('There was an error updating the Student profile.  Your assessment was saved properly, but the Last Assessment and Closeness values in the Student List may not be correct.'); return; }
             calculateQuarters(assessment, assessments);

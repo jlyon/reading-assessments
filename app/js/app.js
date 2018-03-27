@@ -58,12 +58,11 @@ angular.module('app', [
 
         // Helper functions calculates where we are expected to be at a given date
         // formula: {grade level} + {time of year} - {grade level equiv}
-        $rootScope.getExpectedTextLevel = function(gradeLevel, date, mastery) {
+        $rootScope.getExpectedTextLevel = function(gradeLevel, date, mastery, automaticallyAdd) {
 
           // Get % of school-year that is complete
           // Note: months are -1 what you expect so 7 = August, 5 = June
           var now = date;
-          console.log(now);
           var start  = new Date(now.getFullYear(), 7, 14);
           start = start > now ? new Date(now.getFullYear() - 1 , 7, 14) : start;
           var end = new Date(start.getFullYear() + 1, 5, 14);
@@ -72,7 +71,7 @@ angular.module('app', [
           var gradeLevels = [];
           var gradeKey = null;
           for (var i=0; i<$rootScope.growth.length; i++) {
-            if ($rootScope.growth[i].GradeLevel == gradeLevel) {
+            if ($rootScope.growth[i].GradeLevel == Math.floor(gradeLevel)) {
               gradeKey = gradeKey ? gradeKey : i;
               gradeLevels.push($rootScope.growth[i]);
             }
@@ -86,7 +85,13 @@ angular.module('app', [
             key --;
           }
 
-          console.log('fraction', fraction);
+          // This is a hack to support the last quarter showing the first Level of the next year.
+          // (for all grades but Kinder)
+          if (automaticallyAdd != undefined) {
+            key += automaticallyAdd;
+          }
+
+          //console.log('fraction', fraction);
 
           //var foundTextLevel = false;
           var expectedTextLevel = null;
@@ -228,7 +233,6 @@ angular.module('app', [
                 if ($scope.query && $scope.query.length) {
                   students = $filter('filter')(students, $scope.query);
                 }
-                console.log(students);
                 var labels = [];
                 var data = [];
                 var colors = [];

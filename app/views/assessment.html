@@ -1,6 +1,6 @@
 <!--<div ng-if="colors && items && assessments">-->
 <div class="assessment-wrapper">
-<h2 ng-if="student.FirstName">{{student['FirstName']}} {{student['LastName']}}'s Reading Assessments <small>{{student.Crew}}</small></h2>
+<h2 ng-if="student.FirstName">{{student['FirstName']}} {{student['LastName']}}'s Reading Assessments <small>{{student.Crew}}, {{student.Grade == 0 ? 'K' : student.Grade}}</small></h2>
 
 
 <div class="form-group row no-print" ng-if="edit">
