@@ -1,7 +1,9 @@
 <form class="form-inline">
+  <!--
   <div class="form-group no-print">
     <button class="btn btn-primary" ng-click="print()"><i class="fa fa-fw fa-print"></i>Print Selected</button>
   </div>
+  -->
   <div class="form-group">
     <div class="input-group">
       <span class="input-group-addon" id="query-addon"><i class="fa fa-fw fa-search"></i></span>
@@ -16,7 +18,7 @@
 <table class="table table-striped">
   <thead>
   <tr>
-    <th><input type="checkbox" ng-model="checkall" ng-click="checkallClick()"></th>
+    <!--<th><input type="checkbox" ng-model="checkall" ng-click="checkallClick()"></th>-->
     <th><a ng-click="setSort('LastName', $event)" href="#">Name</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('ReadingTeacher', $event)" href="#">Teacher</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('ReadingGroup', $event)" href="#">Group</a></th>
@@ -31,11 +33,12 @@
     <th class="hidden-xs-down"><a ng-click="setSort('Comprehension', $event)" href="#">Comp.</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('Fluency', $event)" href="#">Fluency</a></th>
     <th class="hidden-xs-down"><a ng-click="setSort('Notes', $event)" href="#">Notes</a></th>
+    <th class="hidden-xs-down"><a ng-click="setSort('NeedToEnter', $event)" href="#">Need to Enter</a></th>
   </tr>
   </thead>
   <tbody>
   <tr ng-repeat="student in students | filter: query | orderBy: order">
-    <td><input type="checkbox" ng-model="student.selected"></td>
+    <!--<td><input type="checkbox" ng-model="student.selected"></td>-->
     <td><a ui-sref="editAssessment({student: student.id})">{{student['LastName']}}, {{student['FirstName']}}</a></td>
     <td class="hidden-xs-down">{{student.ReadingTeacher}}</td>
     <td class="hidden-xs-down">{{student.ReadingGroup}}</td>
@@ -54,7 +57,8 @@
     <td class="hidden-xs-down"><span ng-if="student.Accuracy">{{student['Accuracy']}}%</span></td>
     <td class="hidden-xs-down">{{student['Comprehension']}}</td>
     <td class="hidden-xs-down">{{student['Fluency']}}</td>
-    <td class="hidden-xs-down"><a href="#" ng-if="student.Notes" title="{{student.Notes}}" ng-click="return false;"><i class="fa fa-fw fa-align-left"></i></a></td>
+    <td class="hidden-xs-down"><a href="#" ng-if="student.Notes" title="{{student.Notes}}"><i class="fa fa-fw fa-align-left"></i></a></td>
+    <td class="hidden-xs-down text-center"><input type="checkbox" ng-model="student.NeedToEnter" ng-click="clickNeedToEnter(student)" /></td>
   </tr>
   </tbody>
 </table>

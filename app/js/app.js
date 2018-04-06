@@ -101,6 +101,7 @@ angular.module('app', [
             //   expected += parseFloat(item.Growth);
             // }
             if (i < gradeKey + key) {
+
               expectedTextLevel = item.TextLevel;
             }
             // if (item.TextLevel == $scope.assessment.TextLevel) {
@@ -168,6 +169,7 @@ angular.module('app', [
                   expected = $rootScope.getNumericalReadingLevel(expected);
                   var current = $rootScope.getNumericalReadingLevel(data[i].TextLevel);
                   data[i].Closeness = current - expected;
+                  data[i].Copied = data[i].NeedToEnter ? data[i].NeedToEnter : false;
                 }
                 $scope.students = data;
                 $scope.$apply();
@@ -210,6 +212,14 @@ angular.module('app', [
                 else {
                   //alert('Please select at least one student');
                 }
+              }
+
+              $scope.clickNeedToEnter = function(student) {
+                var studentEdit = { NeedToEnter: student.NeedToEnter};
+                console.log(studentEdit);
+                $rootScope.Airtable('Students').update(student.id, studentEdit, function(err, record) {
+                  if (err) { console.log(err);alert('There was an error updating the Student profile.'); return; }
+                });
               }
 
             }

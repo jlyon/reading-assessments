@@ -168,7 +168,7 @@ angular.module('app')
             var lastDate = null;
             var rows = [];
             for (i=0; i<$scope.assessments.length; i++) {
-              if ($scope.assessments[i].Mastery !== 'Hard' && $scope.assessments[i].Mastery !== 'Placement') {
+              if ($scope.assessments[i].Mastery !== 'Hard') {
                 var date = new Date($scope.assessments[i].Date);
                 var level = $rootScope.getNumericalReadingLevel($scope.assessments[i].TextLevel);
                 if (rows.length != 0 && rows[rows.length - 1][0].getTime() === date.getTime()) {
@@ -255,7 +255,7 @@ angular.module('app')
         $scope.updateCloseness = function() {
           $scope.assessment.TextLevel = $scope.assessment.TextLevel.toUpperCase();
 
-          if (!$scope.growth.length || !$scope.assessment.TextLevel || !$scope.assessment.Date || !$scope.assessment.Mastery|| $scope.assessment.Mastery === 'Hard') {
+          if (!$scope.growth.length || !$scope.assessment.TextLevel || !$scope.assessment.Date || !$scope.assessment.Mastery || $scope.assessment.Mastery === 'Hard') {
             $scope.assessment.GrowthLevel = null;
             $scope.assessment.Closeness = null;
             $scope.assessment.GradeLevel = null;
@@ -264,14 +264,12 @@ angular.module('app')
           }
 
           var current = $rootScope.getNumericalReadingLevel($scope.assessment.TextLevel);
-          var expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student, new Date($scope.assessment.Date), $scope.assessment.Mastery);
+          var expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student.Grade, new Date($scope.assessment.Date), $scope.assessment.Mastery);
           var expected = $rootScope.getNumericalReadingLevel(expectedTextLevel);
-
           $scope.assessment.GrowthLevel = current;
           $scope.assessment.Closeness = current - expected;
           $scope.assessment.GradeLevel = Math.floor(current);
           $scope.assessment.ExpectedTextLevel = expectedTextLevel;
-
         }
 
         $scope.cancelAssessment = function() {
