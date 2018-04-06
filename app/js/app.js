@@ -272,10 +272,25 @@ angular.module('app', [
 
                 fetchNextPage();
               }, function done(error) {
+                var now = new Date();
+                for (var i=0; i<data.length; i++) {
+                  var expected = $rootScope.getExpectedTextLevel(data[i].Grade, now);
+                  expected = $rootScope.getNumericalReadingLevel(expected);
+                  var current = $rootScope.getNumericalReadingLevel(data[i].TextLevel);
+                  data[i].Closeness = precisionRound(current - expected, 2);
+                  data[i].Copied = data[i].NeedToEnter ? data[i].NeedToEnter : false;
+                }
                 $scope.students = data;
                 calculate(data);
                 $scope.$apply();
               });
+
+              var precisionRound = function(number, precision) {
+                var factor = Math.pow(10, precision);
+                return Math.round(number * factor) / factor;
+              }
+
+
 
               $scope.updateQuery = function() {
                 calculate($scope.students, $scope.query);
