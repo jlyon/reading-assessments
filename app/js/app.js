@@ -26,7 +26,7 @@ angular.module('app', [
         $rootScope.cache = {};
 
         var Airtable = require('airtable');
-        $rootScope.Airtable = new Airtable({apiKey: 'keyNIbNk17BU31gT8'}).base('tblPHmjv1JnCHTSkV');
+        $rootScope.Airtable = new Airtable({apiKey: 'keyNIbNk17BU31gT8'}).base('appV6NqAqUOyQvJUW');
 
         // Get the GrowthCalculator table
         var items1 = [];
