@@ -6,6 +6,13 @@ angular.module('311AppParent').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/login.html',
+    "<center><h1>Welcome to Lodestar Reading Assessments</h1><p ng-if=\"!msg\">Please login using your Gmail account.</p><div class=\"alert alert-warning\" ng-if=\"msg\">{{msg}}</div><p class=\"btn-login\"><a href=\"#\" ng-click=\"auth.$signInWithPopup('google');$event.preventDefault();\"><img src=\"images/btn_google_signin_dark_normal_web.png\" alt=\"Login with Google\"></a></p></center><style>.btn-login {\n" +
+    "    margin: 20px 0 50px 0;\n" +
+    "  }</style>"
+  );
+
+
   $templateCache.put('views/print.html',
     "<div class=\"print\"><div class=\"alert alert-info no-print\" role=\"alert\"><h1 ng-class=\"loading ? '' : 'force-no-print'\" class=\"no-print\"><i class=\"fa fa-fw fa-spinner fa-spin\"></i>Loading {{total}} students...</h1><div ng-class=\"loading ? 'force-no-print' : ''\"><p>This will print Words and Letters reports for {{total}} students and will require at most <strong>{{total*2}}</strong> sheets of paper</p><p><button onclick=\"window.print()\" class=\"btn btn-primary\"><i class=\"fa fa-fw fa-print\"></i>Print all</button></p></div></div><div ng-repeat=\"student in students\"><div assessment type=\"words\" student=\"student\" print=\"true\"></div><div assessment type=\"letters\" student=\"student\" print=\"true\"></div></div></div>"
   );
