@@ -56,17 +56,33 @@
       -->
       <span class="navbar-brand">Lodestar Reading Assessments</span>
     </div>
-    <ul class="nav navbar-nav" ng-if="showAdmin" ng-class="showAdmin ? '' : 'hidden'">
+    <ul class="nav navbar-nav" ng-if="firebaseUser.role == 'admin'" ng-class="firebaseUser && firebaseUser.role == 'admin' ? '' : 'hidden'">
       <li><a ui-sref="students({query: query})">Student List</a></li>
       <li><a ui-sref="studentsChart({query: query})">Progress Chart</a></li>
+      <li><a ng-href="https://airtable.com/{{activeYear.table}}" target="_blank">Airtable</a></li>
     </ul>
-    <!--
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-        <li><a ui-sref="students">Students</a></li>
-      </ul>
-    </div>
-     -->
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown" ng-class="dropdown.year" ng-if="firebaseUser.role == 'admin'" ng-class="firebaseUser && firebaseUser.role == 'admin' ? '' : 'hidden'">
+        <a href="#" class="dropdown-toggle" ng-click="toggleDropdown('year', $event)">Year: {{activeYear.label}}<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li ng-repeat="year in config.years">
+            <a href="#" ng-click="setYear(year, $event)">
+              {{year.label}}
+              <span ng-if="activeYear.label == year.label" class="fa fa-fw fa-check" />
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="dropdown" ng-class="dropdown.user" ng-if="firebaseUser">
+        <a href="#" class="dropdown-toggle" ng-click="toggleDropdown('user', $event)">
+          <img ng-src="{{ firebaseUser.photoURL }}" width="20" height="20" />
+          {{ firebaseUser.displayName }}<span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="#" ng-click="logout($event)">Sign Out</a></li>
+        </ul>
+      </li>
+    </ul>
   </div>
 </nav>
 
@@ -109,6 +125,8 @@
 <script src="bower_components/angular-lock/angular-lock.js"></script>
 <script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
 <script src="bower_components/angular-tablesort/js/angular-tablesort.js"></script>
+<script src="bower_components/firebase/firebase.js"></script>
+<script src="bower_components/angularfire/dist/angularfire.js"></script>
 <!-- endbower -->
 <script src="js/utilities/airtable.browser.js"></script>
 <script src="bower_components/chart.js/dist/Chart.min.js"></script>
@@ -127,6 +145,17 @@
 <!-- endbuild -->
 <!-- build:js js/vote.min.js -->
 <!-- endbuild -->
+
+<script>
+  // Initialize the Firebase SDK
+  var config = {
+    apiKey: 'AIzaSyBQa3vAtuq1WhiF1v0ZiXchSLOTptnC7og',
+    authDomain: 'lodestar-61c3b.firebaseapp.com',
+    databaseURL: '<your-database-url>',
+    storageBucket: '<your-storage-bucket>'
+  };
+  firebase.initializeApp(config);
+</script>
 
 </body>
 </html>

@@ -17,7 +17,8 @@
     "bootstrap": "^3.3.7",
     "bootstrap-sass": "bootstrap-sass-official#^3.3.7",
     "font-awesome": "fontawesome#^4.7.0",
-    "angular-tablesort": "^1.6.0"
+    "angular-tablesort": "^1.6.0",
+    "angularfire": "^2.3.0"
   },
   "resolutions": {
     "angular": "~1.5.8"

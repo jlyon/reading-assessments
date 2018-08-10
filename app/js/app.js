@@ -12,12 +12,13 @@
 angular.module('app', [
   'ui.router',
   'ngAnimate',
-  'chart.js'
+  'chart.js',
+  'firebase'
 ])
 
   .run(
-    ['$sce', '$timeout', '$rootScope', '$state', '$stateParams',
-      function ($sce, $timeout, $rootScope, $state, $stateParams) {
+    ['$sce', '$timeout', '$rootScope', '$state', '$stateParams', '$window', '$firebaseAuth',
+      function ($sce, $timeout, $rootScope, $state, $stateParams, $window, $firebaseAuth) {
 
         // It's very handy to add references to $state and $stateParams to the
         // $rootScope
@@ -25,8 +26,122 @@ angular.module('app', [
         $rootScope.$stateParams = $stateParams;
         $rootScope.cache = {};
 
+
+        $rootScope.config = {
+          years: [
+            {
+              label: '2018-19',
+              base: 'appV6NqAqUOyQvJUW',
+              key: 'keyNIbNk17BU31gT8',
+              table: 'tblPHmjv1JnCHTSkV'
+            },
+            {
+              label: '2017-18',
+              base: 'appA1AUk2jnO8Xmzt',
+              key: 'keyNIbNk17BU31gT8',
+              table: 'tbluC9NfD8WSZlvZs'
+            },
+          ],
+          admins: [
+            'jeff@albatrossdigital.com',
+            'lisa.perloff@lighthousecharter.org',
+            'virginia.mcmanus@lighthousecharter.org',
+            'ana.garcia@lighthousecharter.or',
+            'daelana.burrell@lighthousecharter.org',
+            'tiffany.do@lighthousecharter.org',
+            'maricruz.martinez@lighthousecharter.org',
+            'robbie.torney@lighthousecharter.org'
+          ],
+          default_year: '2018-19'
+        }
+
+        // Handle year changing
+        $rootScope.activeYear = $window.localStorage.getItem('sightWordsAssessmentYear') ? JSON.parse($window.localStorage.getItem('sightWordsAssessmentYear')) : $rootScope.config.years[0];
+        $rootScope.setYear = function(year, e) {
+          e.preventDefault();
+          $window.localStorage.setItem('sightWordsAssessmentYear', JSON.stringify(year));
+          $rootScope.activeYear = year;
+          $state.go('students', {reload: true});
+          $window.location.href = '/?'+ new Date().getTime() +'#/admin/students';
+        }
+
+        // Authentication
+        $rootScope.auth = $firebaseAuth();
+        var firebaseUser = $window.localStorage.getItem('firebaseUser');
+        firebaseUser = firebaseUser ? JSON.parse(firebaseUser) : null;
+        $rootScope.firebaseUser = firebaseUser;
+
+        // any time auth state changes, add the user data to scope
+        $rootScope.auth.$onAuthStateChanged(function(firebaseUser) {
+          firebaseUser = JSON.parse(JSON.stringify(firebaseUser));
+          if (!firebaseUser) {
+            role = null
+          }
+          else {
+            var role;
+            if (firebaseUser && firebaseUser != null && firebaseUser.email && $rootScope.config.admins.indexOf(firebaseUser.email) !== -1) {
+              role = 'admin';
+            }
+            else {
+              role = 'student';
+            }
+            firebaseUser.role = role;
+            firebaseUser.time = new Date();
+            firebaseUser.providerData = undefined;
+          }
+
+          if ($rootScope.firebaseUser != firebaseUser) {
+            $rootScope.firebaseUser = firebaseUser;
+            $window.localStorage.setItem('firebaseUser', JSON.stringify(firebaseUser));
+          }
+
+          if (firebaseUser && $state.current.name === 'login') {
+            if (role === 'admin') {
+              $state.go('students');
+            }
+            else {
+              $state.go('myFlashcards');
+            }
+          }
+        });
+
+        // Toggle topnav dropdowns
+        var resetDropdown = function() {
+          $rootScope.dropdown = {
+            year: '',
+            user: ''
+          };
+        }
+        resetDropdown()
+
+        $rootScope.toggleDropdown = function(key, e) {
+          e.preventDefault();
+          $rootScope.dropdown[key] = $rootScope.dropdown[key] === 'open' ? '' : 'open';
+        }
+
+        // Check login
+        $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+          if (toState.auth) {
+            if (!$rootScope.firebaseUser) {
+              event.preventDefault();
+              $state.go('login', {msg: 'You need to login'});
+            }
+            if (toState.auth && toState.auth != $rootScope.firebaseUser.role) {
+              event.preventDefault();
+              $state.go('login', {msg: 'Sorry, you don\'t have access.'});
+            }
+          }
+          resetDropdown();
+        });
+        $rootScope.logout = function(e) {
+          $rootScope.firebaseUser = null;
+          $window.localStorage.setItem('firebaseUser', null);
+          $rootScope.auth.$signOut();
+        }
+
+        // Airtable
         var Airtable = require('airtable');
-        $rootScope.Airtable = new Airtable({apiKey: 'keyNIbNk17BU31gT8'}).base('appV6NqAqUOyQvJUW');
+        $rootScope.Airtable = new Airtable({apiKey: $rootScope.activeYear.key}).base($rootScope.activeYear.base);
 
         // Get the GrowthCalculator table
         var items1 = [];
@@ -130,7 +245,8 @@ angular.module('app', [
         // Use $urlRouterProvider to configure any redirects (when) and invalid
         // urls (otherwise).
         $urlRouterProvider
-          .when('/admin', '/admin/students');
+          .when('/admin', '/admin/students')
+          .otherwise('/');
 
         //.otherwise(token ? '/sites' : '/start');
 
@@ -138,6 +254,19 @@ angular.module('app', [
         // State Configurations //
         //////////////////////////
         $stateProvider
+
+          .state("login", {
+            url: '/?msg',
+            templateUrl: 'views/login.html',
+            controller: function ($scope, $rootScope, $state, $filter, $timeout) {
+              $scope.clickLogin = function(e) {
+                e.preventDefault();
+                console.log($state);
+                $scope.msg = $state.params.msg;
+              }
+            }
+          })
+
           .state("students", {
             url: '/admin/students/:query',
             templateUrl: 'views/students.html',
