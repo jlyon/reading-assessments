@@ -79,7 +79,9 @@ angular.module('app')
             // (for all grades but Kinder)
             var automaticallyAdd = (i == quarters.length - 1 && $scope.student.Grade != 0) ? 1 : 0;
 
-            quarters[i].expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student.Grade, new Date(quarters[i].LastDay), null, automaticallyAdd);
+            // We added the `ExpectedProgressLastDay` column to ensure that the Expected
+            // column in the Quarters table matches Lodestar records
+            quarters[i].expectedTextLevel = $rootScope.getExpectedTextLevel($scope.student.Grade, new Date(quarters[i].ExpectedProgressLastDay), null, automaticallyAdd);
 
             // Add assessments
             quarters[i].assessment = null;
