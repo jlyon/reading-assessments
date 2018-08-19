@@ -1,7 +1,18 @@
 <!--<div ng-if="colors && items && assessments">-->
 <div class="assessment-wrapper">
-<h2 ng-if="student.FirstName">{{student['FirstName']}} {{student['LastName']}}'s Reading Assessments <small>{{student.Crew}}, {{student.Grade == 0 ? 'K' : student.Grade}}</small></h2>
 
+<div class="btn-group no-print pull-right">
+  <button type="button" class="btn btn-default" ng-click="setLanguage('en')" ng-class="language == 'en' ? 'active' : ''">English</button>
+  <button type="button" class="btn btn-default" ng-click="setLanguage('es')" ng-class="language == 'es' ? 'active' : ''">Español</button>
+</div>
+
+<h1 ng-if="student.FirstName">
+  {{student['FirstName']}} {{student['LastName']}}
+  <small>
+    {{student.Crew}}, {{student.Grade == 0 ? 'K' : student.Grade}} <Br/>
+    {{ t('Reading Assessments') }}
+  </small>
+</h1>
 
 <div class="form-group row no-print" ng-if="edit">
   <div class="col-sm-12">
@@ -12,16 +23,16 @@
   </div>
 </div>
 
-<h3>At a Glance</h3>
+<h3>{{ t('At a Glance') }}</h3>
 <img src="images/grade-level-chart.png" class="grade-level-chart" alt="Grade level vs text level chart" />
 <table ng-if="assessments.length" class="table table-striped table-quarters">
   <thead>
   <tr>
-    <th>Quarter</th>
-    <th>Level</th>
-    <th>Expected</th>
-    <th>Grade Band</th>
-    <th>Growth</th>
+    <th>{{ t('Quarter') }}</th>
+    <th>{{ t('Level') }}</th>
+    <th>{{ t('Expected') }}</th>
+    <th>{{ t('Grade Band') }}</th>
+    <th>{{ t('Growth') }}</th>
   </tr>
   </thead>
   <tbody>
@@ -37,7 +48,7 @@
 
 <div ng-if="student.Goal || edit">
   <button ng-if="!showEditGoal" class="btn btn-default pull-right no-print" ng-click="toggleEditGoal()"><i class="fa fa-fw fa-pencil"></i>Edit</button>
-  <h3>Goal</h3>
+  <h3>{{ t('Goal') }}</h3>
   <p ng-if="!showEditGoal" class="goal-text">{{student.Goal}}</p>
   <div ng-if="showEditGoal">
     <div class="form-group row">
@@ -59,7 +70,7 @@
 
 <div ng-class="showChart ? '' : 'hidden'">
   <button class="btn btn-default pull-right no-print" ng-click="toggleChart()"><i class="fa fa-fw fa-times"></i>Hide</button>
-  <h3>Reading Progress</h3>
+  <h3>{{ t('Reading Progress') }}</h3>
   <div class="reading-progress-chart-wrapper">
     <div id="chart_div" class="reading-progress-chart"></div>
   </div>
@@ -68,7 +79,7 @@
 
 <div ng-if="showAllAssessments">
   <button class="btn btn-default pull-right no-print" ng-click="toggleAllAssessments()"><i class="fa fa-fw fa-times"></i>Hide</button>
-  <h3>All Assessments</h3>
+  <h3>{{ t('All Assessments') }}</h3>
   <p ng-if="!assessments.length">No assessments have been created for {{student['FirstName']}} {{student['LastName']}}.</p>
   <table ng-if="assessments.length" class="table table-striped table-assessments">
     <thead>

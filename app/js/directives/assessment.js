@@ -15,6 +15,30 @@ angular.module('app')
       templateUrl: 'views/assessment.html',
       link: function($scope, $element, $attrs, $window) {
 
+        // Add support for Spanish translations
+        $scope.language = 'en';
+        $scope.setLanguage = function(language) {
+          $scope.language = language;
+        }
+        $scope.t = function(str) {
+          var translations = {
+            en: {},
+            es: {
+              'Reading Assessments': 'Exámenes de lectura',
+              'At a Glance': 'A la vista',
+              'Quarter': 'Cuarto',
+              'Level': 'Nivel',
+              'Expected': 'Nivel esperado',
+              'Grade Band': 'Grado',
+              'Growth': 'Crecimiento',
+              'Goal': 'Meta',
+              'Reading Progress': 'Progreso de lectura',
+              'All Assessments': 'Exámenes'
+            }
+          }
+          return translations[$scope.language][str] != undefined ? translations[$scope.language][str] : str;
+        }
+
         $scope.show = false;
         $scope.showAllAssessments = $scope.edit;
         $scope.showChart = true;
