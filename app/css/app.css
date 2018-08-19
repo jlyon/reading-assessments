@@ -11,9 +11,17 @@ h1 {
   margin: 0 auto; }
 
 img.grade-level-chart,
-table.quarters {
+table.table-quarters {
   max-width: 100%;
-  width: 100%; }
+  width: 100%;
+  font-size: 20px; }
+
+td.alt-font {
+  font-family: 'Didact Gothic', serif !important; }
+
+table.table-quarters td:not(:first-child),
+table.table-quarters th:not(:first-child) {
+  text-align: center; }
 
 img.grade-level-chart {
   margin-bottom: 1em; }
@@ -22,6 +30,14 @@ img.grade-level-chart {
   width: 100%;
   height: 300px;
   marign-top: 10px; }
+
+.goal-text {
+  white-space: pre-wrap;
+  font-size: 1.4em;
+  line-height: 1.5em; }
+
+.goal-edit {
+  height: 8em !important; }
 
 .assessment-form input,
 .assessment-form select,

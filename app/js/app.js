@@ -42,24 +42,43 @@ angular.module('app', [
               table: 'tbluC9NfD8WSZlvZs'
             },
           ],
-          admins: [
-            'jeff@albatrossdigital.com',
-            'lisa.perloff@lighthousecharter.org',
-            'virginia.mcmanus@lighthousecharter.org',
-            'ana.garcia@lighthousecharter.or',
-            'daelana.burrell@lighthousecharter.org',
-            'tiffany.do@lighthousecharter.org',
-            'maricruz.martinez@lighthousecharter.org',
-            'robbie.torney@lighthousecharter.org'
-          ],
+          admins: {
+            'jeff@albatrossdigital.com': {
+              role: 'admin'
+            },
+            'lisa.perloff@lighthousecharter.org': {
+              role: 'admin',
+              teacher: 'lisa'
+            },
+            'virginia.mcmanus@lighthousecharter.org': {
+              role: 'admin',
+              teacher: 'virginia'
+            },
+            'ana.garcia@lighthousecharter.or': {
+              role: 'admin',
+              teacher: 'ana'
+            },
+            'daelana.burrell@lighthousecharter.org': {
+              role: 'admin'
+            },
+            'tiffany.do@lighthousecharter.org': {
+              role: 'admin'
+            },
+            'maricruz.martinez@lighthousecharter.org': {
+              role: 'admin'
+            },
+            'robbie.torney@lighthousecharter.org': {
+              role: 'admin'
+            }
+          },
           default_year: '2018-19'
         }
 
         // Handle year changing
-        $rootScope.activeYear = $window.localStorage.getItem('sightWordsAssessmentYear') ? JSON.parse($window.localStorage.getItem('sightWordsAssessmentYear')) : $rootScope.config.years[0];
+        $rootScope.activeYear = $window.localStorage.getItem('readingAssessmentYear') ? JSON.parse($window.localStorage.getItem('readingAssessmentYear')) : $rootScope.config.years[0];
         $rootScope.setYear = function(year, e) {
           e.preventDefault();
-          $window.localStorage.setItem('sightWordsAssessmentYear', JSON.stringify(year));
+          $window.localStorage.setItem('readingAssessmentYear', JSON.stringify(year));
           $rootScope.activeYear = year;
           $state.go('students', {reload: true});
           $window.location.href = '/?'+ new Date().getTime() +'#/admin/students';
@@ -79,11 +98,13 @@ angular.module('app', [
           }
           else {
             var role;
-            if (firebaseUser && firebaseUser != null && firebaseUser.email && $rootScope.config.admins.indexOf(firebaseUser.email) !== -1) {
-              role = 'admin';
+            if (firebaseUser && firebaseUser != null && firebaseUser.email && $rootScope.config.admins[firebaseUser.email] !== undefined) {
+              role = $rootScope.config.admins[firebaseUser.email];
             }
             else {
-              role = 'student';
+              role = {
+                role: 'student'
+              };
             }
             firebaseUser.role = role;
             firebaseUser.time = new Date();
@@ -96,8 +117,9 @@ angular.module('app', [
           }
 
           if (firebaseUser && $state.current.name === 'login') {
-            if (role === 'admin') {
-              $state.go('students');
+            if (role.role === 'admin') {
+              var params = (role.teacher != undefined) ? { query: role.teacher } : {};
+              $state.go('students', params);
             }
             else {
               $state.go('myFlashcards');
@@ -126,7 +148,7 @@ angular.module('app', [
               event.preventDefault();
               $state.go('login', {msg: 'You need to login'});
             }
-            if (toState.auth && toState.auth != $rootScope.firebaseUser.role) {
+            if (toState.auth && toState.auth != $rootScope.firebaseUser.role.role) {
               event.preventDefault();
               $state.go('login', {msg: 'Sorry, you don\'t have access.'});
             }
@@ -161,7 +183,7 @@ angular.module('app', [
 
         // Helper function turns "C" (etc) into a number
         $rootScope.getNumericalReadingLevel = function(textLevel) {
-          var num = 0;
+          var num = parseFloat($rootScope.growth[0].GradeLevel);
           for (var i=0; i<$rootScope.growth.length; i++) {
             if ($rootScope.growth[i].TextLevel == textLevel) {
               break;
@@ -195,10 +217,17 @@ angular.module('app', [
           var key = Math.round(fraction * gradeLevels.length);
 
           // If Mastery is Hard they are really one step back
-          // @todo: is this correct?
           if (mastery != undefined && mastery === 'Hard') {
             key --;
           }
+
+          // If Mastery is Independent they are really one step ahead
+          // if (mastery != undefined && mastery === 'Independent') {
+          //   key ++;
+          // }
+
+          // Helpful for debugging
+          //console.log(key, fraction, gradeLevels.length);
 
           // This is a hack to support the last quarter showing the first Level of the next year.
           // (for all grades but Kinder)
@@ -215,14 +244,15 @@ angular.module('app', [
             // if (i < gradeKey + key - 1) {
             //   expected += parseFloat(item.Growth);
             // }
-            if (i < gradeKey + key) {
 
+            if (i < gradeKey + key) {
               expectedTextLevel = item.TextLevel;
             }
             // if (item.TextLevel == $scope.assessment.TextLevel) {
             //   foundTextLevel = item;
             // }
           }
+          //console.log('expectedTextLevel', expectedTextLevel);
 
           return expectedTextLevel;
         };
@@ -259,10 +289,10 @@ angular.module('app', [
             url: '/?msg',
             templateUrl: 'views/login.html',
             controller: function ($scope, $rootScope, $state, $filter, $timeout) {
+              $scope.msg = $state.params.msg;
+
               $scope.clickLogin = function(e) {
                 e.preventDefault();
-                console.log($state);
-                $scope.msg = $state.params.msg;
               }
             }
           })
@@ -270,7 +300,7 @@ angular.module('app', [
           .state("students", {
             url: '/admin/students/:query',
             templateUrl: 'views/students.html',
-            // auth: true,
+            auth: 'admin',
             /*resolve: {
                 cards: function ($stateParams, $rootScope, $http) {
 
@@ -358,7 +388,7 @@ angular.module('app', [
           .state("studentsChart", {
             url: '/admin/chart/:query',
             templateUrl: 'views/students-chart.html',
-            // auth: true,
+            auth: 'admin',
             /*resolve: {
                 cards: function ($stateParams, $rootScope, $http) {
 
@@ -429,6 +459,7 @@ angular.module('app', [
 
           .state("editAssessment", {
             url: '/admin/student/:student',
+            auth: 'admin',
             template: '<div assessment edit="true" type="type" student="student"></div>',
             controller: function ($scope, $rootScope, $state, $filter, $http) {
               $rootScope.showAdmin = true;
@@ -449,6 +480,7 @@ angular.module('app', [
           .state("printAssessment", {
             url: '/print/:students',
             templateUrl: 'views/print.html',
+            auth: 'admin',
             controller: function ($scope, $rootScope, $state, $filter, $http) {
               var students = $state.params.students.split(',');
               $scope.total = students.length;

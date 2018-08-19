@@ -18,6 +18,7 @@ angular.module('app')
         $scope.show = false;
         $scope.showAllAssessments = $scope.edit;
         $scope.showChart = true;
+        $scope.showEditGoal = false;
 
         $timeout(function(){
           $scope.link = window.location.href.replace('/admin', '');
@@ -209,6 +210,29 @@ angular.module('app')
           $scope.showChart = !$scope.showChart;
         }
 
+        $scope.toggleEditGoal = function() {
+          $scope.showEditGoal = !$scope.showEditGoal;
+          if ($scope.showEditGoal) {
+            $timeout(function() {
+              document.getElementById("editGoal").select();
+            });
+          }
+        }
+
+        $scope.editGoal = '';
+        $scope.saveGoal = function(value) {
+          var studentEdit = {};
+          studentEdit['Goal'] = value;
+          console.log('saving', studentEdit);
+          $rootScope.Airtable('Students').update($scope.student.id, studentEdit, function(err, record) {
+            if (err) { console.log(err);alert('There was an error updating the Student goal.'); return; }
+            $scope.showEditGoal = false;
+            $scope.editGoal = '';
+            $scope.student.Goal = value;
+            $scope.$apply();
+          });
+        }
+
         $scope.newAssessment = function() {
           $scope.assessment = {
             Student: [$scope.student],
@@ -335,6 +359,7 @@ angular.module('app')
           }
 
           var studentEdit = {};
+          console.log($scope.needToEnter);
           studentEdit['LastAssessment'] = assessment.Date !== undefined ? assessment.Date : null;
           studentEdit['Closeness'] = assessment.Closeness !== undefined ? assessment.Closeness : null;
           studentEdit['Accuracy'] = assessment.Accuracy !== undefined ? assessment.Accuracy : null;
@@ -345,6 +370,7 @@ angular.module('app')
           studentEdit['TextLevel'] = assessment.TextLevel !== undefined ? assessment.TextLevel : null;
           studentEdit['Genre'] = assessment.Genre !== undefined ? assessment.Genre : null;
           studentEdit['AnnualGrowth'] = assessment.GrowthLevel === undefined || assessment.GrowthLevel === null ? null : assessment.GrowthLevel - assessments[0].GrowthLevel;
+          studentEdit['NeedToEnter'] = $scope.needToEnter;
           //console.log('saving', studentEdit);
           $rootScope.Airtable('Students').update($scope.student.id, studentEdit, function(err, record) {
             if (err) { console.log(err);alert('There was an error updating the Student profile.  Your assessment was saved properly, but the Last Assessment and Closeness values in the Student List may not be correct.'); return; }
@@ -354,9 +380,10 @@ angular.module('app')
 
         }
 
-
-
-
+        $scope.needToEnter = false;
+        $scope.clickNeedToEnter = function(value) {
+          $scope.needToEnter = value;
+        }
 
       }
     };
