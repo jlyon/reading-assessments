@@ -40,7 +40,7 @@
     <td>{{item.Name}}</td>
     <td class="alt-font">{{item.assessment.TextLevel}}</td>
     <td class="alt-font">{{item.expectedTextLevel}}</td>
-    <td>{{item.assessment.GradeLevel === 0 ? 'K' : item.assessment.GradeLevel}}</td>
+    <td>{{item.assessment.GradeLevel === 0 ? 'K' : (item.assessment.GradeLevel === -1 ? 'Pre-K' : item.assessment.GradeLevel)}}</td>
     <td><span ng-if="item.assessment.GrowthLevel">{{item.assessment.GrowthLevel - assessments[0].GrowthLevel | number:2}}</span></td>
   </tr>
   </tbody>
