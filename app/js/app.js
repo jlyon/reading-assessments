@@ -200,10 +200,11 @@ angular.module('app', [
           // Get % of school-year that is complete
           // Note: months are -1 what you expect so 7 = August, 5 = June
           var now = date;
-          var start  = new Date(now.getFullYear(), 7, 14);
-          start = start > now ? new Date(now.getFullYear() - 1 , 7, 14) : start;
+          var start  = new Date(now.getFullYear(), 7, 10);
+          start = start > now ? new Date(now.getFullYear() - 1 , 7, 10) : start;
           var end = new Date(start.getFullYear() + 1, 5, 14);
           var fraction = (now - start)/(end - start);
+          console.log(now, start, end);
 
           var gradeLevels = [];
           var gradeKey = null;
