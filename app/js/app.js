@@ -105,6 +105,8 @@ angular.module('app', [
               role = {
                 role: 'student'
               };
+              // There is no non-admin acceess
+              return $state.go('login', {msg: 'Sorry, you do not have access.'});
             }
             firebaseUser.role = role;
             firebaseUser.time = new Date();
@@ -121,9 +123,9 @@ angular.module('app', [
               var params = (role.teacher != undefined) ? { query: role.teacher } : {};
               $state.go('students', params);
             }
-            else {
-              $state.go('myFlashcards');
-            }
+            // else {
+            //   $state.go('myFlashcards');
+            // }
           }
         });
 
@@ -185,10 +187,10 @@ angular.module('app', [
         $rootScope.getNumericalReadingLevel = function(textLevel) {
           var num = parseFloat($rootScope.growth[0].GradeLevel);
           for (var i=0; i<$rootScope.growth.length; i++) {
+            num += parseFloat($rootScope.growth[i].Growth);
             if ($rootScope.growth[i].TextLevel == textLevel) {
               break;
             }
-            num += parseFloat($rootScope.growth[i].Growth);
           }
           return num;
         }
